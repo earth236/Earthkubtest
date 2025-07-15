@@ -619,7 +619,7 @@
     <div class="container">
         <div class="header">
             <h1>🚀 Crypto Trading Signal Scoring</h1>
-            <p>ระบบให้คะแนนสัญญาณการเทรดคริปโตแกะมืออาชีพ</p>
+            <p>ระบบให้คะแนนสัญญาณการเทรดคริปโตมืออาชีพ</p>
             
             <div class="trading-mode">
                 <div class="mode-btn active" onclick="setMode('long')">📈 LONG SIGNALS</div>
@@ -858,8 +858,26 @@
                 <h2 class="section-title">🛑 Cut Loss Conditions Monitor</h2>
                 
                 <div class="auto-note">
-                    <strong>⚠️ Cut Loss Alert:</strong> ติ๊กเลือกเงื่อนไขที่เกิดขึ้น ระบบจะคำนวณ Cut Loss Score ตามน้ำหนัก<br>
-                    <strong>🎯 Risk Management:</strong> Score ≥50% = พิจารณา Cut Loss | Score ≥70% = ต้อง Cut Loss ทันที
+                    <strong>🎯 EMA 5 Filter:</strong> ถ้ายังไม่หลุด EMA 5 (4H) จะลดน้ำหนักทุกเงื่อนไข<br>
+                    <strong>⚠️ Cut Loss Alert:</strong> Score ≥60% = พิจารณา Cut Loss | Score ≥80% = ต้อง Cut Loss ทันที<br>
+                    <strong>🔒 EMA 5 Filter:</strong> ยังไม่หลุด = ห้าม Cut (ยกเว้นเหตุฉุกเฉิน) | หลุดแล้ว = ใช้เกณฑ์ปกติ
+                </div>
+
+                <!-- EMA 5 Filter Section -->
+                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 20px; border-radius: 15px; margin-bottom: 25px; color: white;">
+                    <h3 style="margin: 0 0 15px 0; display: flex; align-items: center; gap: 10px;">
+                        🎯 EMA 5 (4H) Filter
+                    </h3>
+                    <div class="checkbox-item" style="background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5);">
+                        <input type="checkbox" id="ema5_broken" data-filter="true">
+                        <label for="ema5_broken" style="color: white; font-weight: bold;">📉 หลุด EMA 5 (4H) แล้ว - ปลดล็อกระบบ Cut Loss</label>
+                        <div class="checkbox-points" style="background: rgba(239, 68, 68, 0.8); color: white;">🔓</div>
+                    </div>
+                    <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px; font-size: 0.9rem;">
+                        <strong>💡 หลักการ:</strong> EMA 5 (4H) = ข้อมูล 20 ชั่วโมง ไวพอแล้ว<br>
+                        <strong>🔒 ยังไม่หลุด:</strong> ลดน้ำหนักทุกเงื่อนไข 50% + เกณฑ์ Cut สูงขึ้น<br>
+                        <strong>🔓 หลุดแล้ว:</strong> ใช้น้ำหนักเต็ม + เกณฑ์ Cut ปกติ
+                    </div>
                 </div>
 
                 <div class="two-column">
@@ -880,7 +898,7 @@
                     </div>
 
                     <div>
-                        <h3 style="color: #f97316; margin-bottom: 15px; font-weight: bold;">📊 Technical Indicators (25%)</h3>
+                        <h3 style="color: #f97316; margin-bottom: 15px; font-weight: bold;">📊 Technical Indicators (20%)</h3>
                         <div class="checkbox-group">
                             <div class="checkbox-item" style="border-color: #f97316;">
                                 <input type="checkbox" id="cutloss_rsi" data-severity="medium" data-weight="10">
@@ -891,11 +909,6 @@
                                 <input type="checkbox" id="cutloss_macd" data-severity="medium" data-weight="10">
                                 <label for="cutloss_macd">MACD หดตัว/ลดลง - Medium</label>
                                 <div class="checkbox-points" style="background: linear-gradient(45deg, #f97316, #ea580c);">10%</div>
-                            </div>
-                            <div class="checkbox-item" style="border-color: #f59e0b;">
-                                <input type="checkbox" id="cutloss_ema5" data-severity="low" data-weight="5">
-                                <label for="cutloss_ema5">หลุด EMA 5 (4H) - Low</label>
-                                <div class="checkbox-points" style="background: linear-gradient(45deg, #f59e0b, #d97706);">5%</div>
                             </div>
                         </div>
                     </div>
@@ -1103,22 +1116,39 @@
                     </div>
                     <div class="tip-card">
                         <h4>🛑 Cut Loss Weight System</h4>
-                        <p><strong>Price Action (60%):</strong><br>
+                        <p><strong>🎯 EMA 5 (4H) Filter:</strong><br>
+                        • ยังไม่หลุด: ลดน้ำหนักทุกเงื่อนไข 50%<br>
+                        • หลุดแล้ว: ใช้น้ำหนักเต็ม 100%<br>
+                        <strong>Price Action (60%):</strong><br>
                         • หลุดแนวรับ S/R - 35%<br>
                         • หลุดเทรนไลน์ - 25%<br>
-                        <strong>Technical Indicators (25%):</strong><br>
+                        <strong>Technical Indicators (20%):</strong><br>
                         • RSI < EMA RSI 14 - 10%<br>
                         • MACD หดตัว/ลดลง - 10%<br>
-                        • หลุด EMA 5 (4H) - 5%<br>
-                        <strong>Score ≥50%:</strong> พิจารณา Cut Loss<br>
-                        <strong>Score ≥70%:</strong> ต้อง Cut Loss ทันที!</p>
+                        <strong>🔒 ยังไม่หลุด EMA 5:</strong> Score ≥50% = พิจารณา | ≥70% = Cut<br>
+                        <strong>🔓 หลุด EMA 5 แล้ว:</strong> Score ≥40% = พิจารณา | ≥60% = Cut</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>🆕 EMA 5 Filter Features</h4>
+                        <p><strong>🎯 EMA 5 (4H) Filter:</strong><br>
+                        • EMA 5 (4H) = ข้อมูล 20 ชั่วโมง ไวพอแล้ว<br>
+                        • ไม่หลุด = ห้าม Cut Loss (ยกเว้นฉุกเฉิน)<br>
+                        • หลุดแล้ว = แนวโน้มเปลี่ยน พิจารณา Cut<br>
+                        <strong>🔒 Smart Weight Adjustment:</strong><br>
+                        • ยังไม่หลุด EMA 5 = ลดน้ำหนัก 50%<br>
+                        • หลุดแล้ว = ใช้น้ำหนักเต็ม<br>
+                        <strong>📊 Adaptive Thresholds:</strong><br>
+                        • เกณฑ์ Cut Loss ปรับตาม EMA 5 Status<br>
+                        • ระบบป้องกัน False Cut Loss</p>
                     </div>
                     <div class="tip-card">
                         <h4>⚠️ Important Notes</h4>
                         <p>24/7 market - no gaps but watch thin liquidity<br>
                         News impact faster than traditional markets<br>
                         Always combine with S/R analysis<br>
-                        <strong>Cut Loss:</strong> วินัยสำคัญกว่ากำไร</p>
+                        <strong>EMA 5 Rule:</strong> EMA 5 (4H) คือหัวใจของระบบ<br>
+                        <strong>Cut Loss:</strong> วินัยสำคัญกว่ากำไร<br>
+                        <strong>Override:</strong> Gap >5%, Flash Crash, Major News</p>
                     </div>
                 </div>
             </div>
@@ -1214,61 +1244,97 @@
 
         function updateCutLossStatus() {
             const cutlossCheckboxes = document.querySelectorAll('input[id^="cutloss_"]:checked');
+            const ema5Filter = document.getElementById('ema5_broken').checked;
+            
             let totalScore = 0;
             let activeConditions = [];
             
             cutlossCheckboxes.forEach(checkbox => {
-                const weight = parseFloat(checkbox.dataset.weight);
+                let weight = parseFloat(checkbox.dataset.weight);
                 const severity = checkbox.dataset.severity;
                 const label = checkbox.nextElementSibling.textContent;
+                
+                // EMA 5 Filter: ถ้ายังไม่หลุด EMA 5 ลดน้ำหนัก 50%
+                if (!ema5Filter) {
+                    weight = weight * 0.5;
+                }
                 
                 totalScore += weight;
                 activeConditions.push({
                     label: label,
                     severity: severity,
-                    weight: weight
+                    weight: weight,
+                    originalWeight: parseFloat(checkbox.dataset.weight)
                 });
             });
             
-            // Determine alert level based on score
+            // เกณฑ์ Cut Loss ปรับตาม EMA 5 Filter
             let alertLevel = '';
             let alertLevelColor = '';
             let recommendation = '';
             
-            if (totalScore >= 70) {
-                alertLevel = 'CRITICAL ALERT 🚨';
-                alertLevelColor = '#dc2626';
-                recommendation = '⛔ ต้อง CUT LOSS ทันที! Cut Loss Score ≥70% = ความเสี่ยงสูงมาก อย่าปล่อยให้ขาดทุนมากกว่านี้';
-            } else if (totalScore >= 50) {
-                alertLevel = 'HIGH RISK ⚠️';
-                alertLevelColor = '#ef4444';
-                recommendation = '🔍 พิจารณา CUT LOSS อย่างจริงจัง! Cut Loss Score ≥50% = ควรออกจากตำแหน่งเพื่อปกป้องเงินทุน';
-            } else if (totalScore >= 30) {
-                alertLevel = 'CAUTION ⚡';
-                alertLevelColor = '#f97316';
-                recommendation = '⚠️ ระมัดระวัง! Cut Loss Score ≥30% = มีสัญญาณเตือน ติดตาม EMA และ S/R อย่างใกล้ชิด';
-            } else if (totalScore > 0) {
-                alertLevel = 'WATCH ⚡';
-                alertLevelColor = '#f59e0b';
-                recommendation = '👀 ติดตาม! Cut Loss Score <30% = มีสัญญาณเตือนเล็กน้อย เฝ้าระวังการเปลี่ยนแปลง';
+            if (!ema5Filter) {
+                // ยังไม่หลุด EMA 5 (4H) - เกณฑ์สูงขึ้น
+                if (totalScore >= 70) {
+                    alertLevel = 'CRITICAL ALERT 🚨';
+                    alertLevelColor = '#dc2626';
+                    recommendation = '⛔ แม้ไม่หลุด EMA 5 แต่ Cut Loss Score ≥70%! พิจารณา Cut Loss ทันที เพราะมีความเสี่ยงสูงมาก';
+                } else if (totalScore >= 50) {
+                    alertLevel = 'HIGH RISK ⚠️';
+                    alertLevelColor = '#ef4444';
+                    recommendation = '🔍 Cut Loss Score ≥50% ระวังมาก! EMA 5 ยังไม่หลุดแต่สัญญาณเตือนชัดเจน ติดตามใกล้ชิด';
+                } else if (totalScore >= 30) {
+                    alertLevel = 'CAUTION ⚡';
+                    alertLevelColor = '#f97316';
+                    recommendation = '⚠️ มีสัญญาณเตือน แต่ EMA 5 (4H) ยังไม่หลุด = ยังปลอดภัย ติดตามต่อไป';
+                } else if (totalScore > 0) {
+                    alertLevel = 'WATCH 👀';
+                    alertLevelColor = '#f59e0b';
+                    recommendation = '👀 มีสัญญาณเล็กน้อย แต่ EMA 5 (4H) ยังแข็งแรง = ยังไม่ต้องกังวล';
+                } else {
+                    alertLevel = 'SAFE ✅';
+                    alertLevelColor = '#10b981';
+                    recommendation = '✅ ปลอดภัยมาก! EMA 5 (4H) ยังไม่หลุด + ไม่มีสัญญาณเตือน';
+                }
             } else {
-                alertLevel = 'SAFE ✅';
-                alertLevelColor = '#10b981';
-                recommendation = '✅ ยังปลอดภัย ไม่มีเงื่อนไขการ Cut Loss เกิดขึ้น แต่ยังคงต้องติดตามอย่างต่อเนื่อง';
+                // หลุด EMA 5 (4H) แล้ว - ใช้เกณฑ์ปกติ
+                if (totalScore >= 60) {
+                    alertLevel = 'CRITICAL ALERT 🚨';
+                    alertLevelColor = '#dc2626';
+                    recommendation = '🚨 หลุด EMA 5 (4H) + Cut Loss Score ≥60%! ต้อง CUT LOSS ทันที! แนวโน้มเปลี่ยนแล้ว';
+                } else if (totalScore >= 40) {
+                    alertLevel = 'HIGH RISK ⚠️';
+                    alertLevelColor = '#ef4444';
+                    recommendation = '⚠️ หลุด EMA 5 (4H) + Cut Loss Score ≥40%! พิจารณา CUT LOSS อย่างจริงจัง';
+                } else if (totalScore >= 25) {
+                    alertLevel = 'CAUTION ⚡';
+                    alertLevelColor = '#f97316';
+                    recommendation = '⚡ หลุด EMA 5 (4H) แล้ว! แม้ Cut Loss Score ยังไม่สูง แต่ต้องระวังมากขึ้น';
+                } else if (totalScore > 0) {
+                    alertLevel = 'WATCH 👀';
+                    alertLevelColor = '#f59e0b';
+                    recommendation = '👀 หลุด EMA 5 (4H) = แนวโน้มเปลี่ยน ติดตามสัญญาณอื่นใกล้ชิด';
+                } else {
+                    alertLevel = 'EMA 5 BROKEN ⚠️';
+                    alertLevelColor = '#f97316';
+                    recommendation = '⚠️ หลุด EMA 5 (4H) แล้ว! แม้ยังไม่มีสัญญาณอื่น แต่ต้องเตรียมพร้อม Cut Loss';
+                }
             }
             
             // Update display
             document.getElementById('alertLevel').textContent = alertLevel;
             document.getElementById('alertLevel').style.color = alertLevelColor;
-            document.getElementById('cutlossScore').textContent = `Cut Loss Score: ${totalScore.toFixed(0)}%`;
+            document.getElementById('cutlossScore').textContent = `Cut Loss Score: ${totalScore.toFixed(0)}%${!ema5Filter ? ' (ลด 50%)' : ''}`;
             document.getElementById('alertRecommendation').textContent = recommendation;
             
             // Update active conditions list
             const activeConditionsDiv = document.getElementById('activeConditions');
-            if (activeConditions.length === 0) {
-                activeConditionsDiv.innerHTML = '<div style="color: #6b7280;">ยังไม่มีเงื่อนไขใดที่เกิดขึ้น</div>';
+            if (activeConditions.length === 0 && !ema5Filter) {
+                activeConditionsDiv.innerHTML = '<div style="color: #10b981; font-weight: bold;">✅ EMA 5 (4H) ยังไม่หลุด + ไม่มีเงื่อนไขเตือน = ปลอดภัยมาก</div>';
+            } else if (activeConditions.length === 0 && ema5Filter) {
+                activeConditionsDiv.innerHTML = '<div style="color: #f97316; font-weight: bold;">⚠️ หลุด EMA 5 (4H) แล้ว แต่ยังไม่มีสัญญาณเตือนอื่น</div>';
             } else {
-                activeConditionsDiv.innerHTML = activeConditions.map(condition => {
+                let conditionsList = activeConditions.map(condition => {
                     let color = '';
                     let icon = '';
                     switch(condition.severity) {
@@ -1282,17 +1348,27 @@
                             <span style="margin-right: 8px;">${icon}</span>
                             <span style="color: ${color}; font-weight: 500;">${condition.label}</span>
                         </div>
-                        <span style="background: ${color}; color: white; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 0.9rem;">${condition.weight}%</span>
+                        <span style="background: ${color}; color: white; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 0.9rem;">
+                            ${condition.weight.toFixed(1)}%${!ema5Filter && condition.weight !== condition.originalWeight ? ` (จาก ${condition.originalWeight}%)` : ''}
+                        </span>
                     </div>`;
                 }).join('');
+
+                if (ema5Filter) {
+                    conditionsList = `<div style="background: #ef444415; border-left: 4px solid #ef4444; padding: 10px; border-radius: 6px; margin-bottom: 10px;">
+                        <strong style="color: #ef4444;">🔓 EMA 5 (4H) หลุดแล้ว - ใช้น้ำหนักเต็ม 100%</strong>
+                    </div>` + conditionsList;
+                } else {
+                    conditionsList = `<div style="background: #10b98115; border-left: 4px solid #10b981; padding: 10px; border-radius: 6px; margin-bottom: 10px;">
+                        <strong style="color: #10b981;">🔒 EMA 5 (4H) ยังไม่หลุด - ลดน้ำหนักทุกเงื่อนไข 50%</strong>
+                    </div>` + conditionsList;
+                }
+
+                activeConditionsDiv.innerHTML = conditionsList;
             }
             
-            // Show/hide results
-            if (totalScore > 0) {
-                document.getElementById('cutlossResults').style.display = 'block';
-            } else {
-                document.getElementById('cutlossResults').style.display = 'none';
-            }
+            // Show results
+            document.getElementById('cutlossResults').style.display = 'block';
         }
 
         function calculatePosition() {
@@ -1425,8 +1501,8 @@
                 checkbox.checked = false;
             });
             
-            // Reset Cut Loss checkboxes
-            document.querySelectorAll('input[type="checkbox"][id^="cutloss_"]').forEach(checkbox => {
+            // Reset Cut Loss checkboxes including EMA 5 filter
+            document.querySelectorAll('input[type="checkbox"][id^="cutloss_"], #ema5_broken').forEach(checkbox => {
                 checkbox.checked = false;
             });
             
@@ -1465,7 +1541,7 @@
 
         // Add event listeners to all checkboxes
         document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            if (checkbox.id.startsWith('cutloss_')) {
+            if (checkbox.id.startsWith('cutloss_') || checkbox.id === 'ema5_broken') {
                 checkbox.addEventListener('change', updateCutLossStatus);
             } else {
                 checkbox.addEventListener('change', updateScore);
