@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Trading Signal Scoring System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 2px solid #0ea5e9;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            border-bottom: 3px solid #0284c7;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="crypto" patternUnits="userSpaceOnUse" width="20" height="20"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23crypto)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .trading-mode {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mode-btn {
+            padding: 12px 25px;
+            border: 2px solid rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .mode-btn:hover, .mode-btn.active {
+            background: rgba(255,255,255,0.3);
+            border-color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255,255,255,0.2);
+        }
+
+        .main-content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .scoring-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #0ea5e9;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #0369a1;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .category {
+            margin-bottom: 20px;
+            padding: 18px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #0ea5e9;
+            border: 1px solid #e2e8f0;
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #0369a1;
+        }
+
+        .category-weight {
+            background: linear-gradient(45deg, #0ea5e9, #10b981);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .signal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 1rem;
+        }
+
+        .signal-item:last-child {
+            border-bottom: none;
+        }
+
+        .signal-name {
+            flex: 1;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .signal-points {
+            background: linear-gradient(45deg, #0ea5e9, #10b981);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .calculator {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px solid #10b981;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #0369a1;
+            font-size: 1rem;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #ffffff;
+            color: #1f2937;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .input-group input:read-only {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: #0369a1;
+            font-weight: bold;
+            border-color: #0ea5e9;
+        }
+
+        .checkbox-group {
+            display: grid;
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #e2e8f0;
+        }
+
+        .checkbox-item:hover {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border-color: #0ea5e9;
+            transform: translateY(-1px);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 12px;
+            transform: scale(1.3);
+            accent-color: #0ea5e9;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .checkbox-points {
+            background: linear-gradient(45deg, #0ea5e9, #10b981);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-reset {
+            background: linear-gradient(45deg, #f97316, #ea580c);
+            color: white;
+            border: 2px solid #f97316;
+        }
+
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(249, 115, 22, 0.3);
+        }
+
+        .btn-long {
+            background: linear-gradient(45deg, #10b981, #059669);
+            color: white;
+            border: 2px solid #10b981;
+        }
+
+        .btn-long:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-short {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
+            border: 2px solid #ef4444;
+        }
+
+        .btn-short:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            border: 2px solid #0284c7;
+        }
+
+        .score-display {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .signal-strength {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .recommendation {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .position-results {
+            margin-top: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 12px;
+            border: 2px solid #0ea5e9;
+        }
+
+        .result-card {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .result-card h4 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .position-size {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .result-details {
+            display: grid;
+            gap: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 8px;
+            font-size: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .detail-item span:first-child {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .detail-item span:last-child {
+            color: #0369a1;
+            font-weight: bold;
+        }
+
+        .tp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .tp-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .tp-item label {
+            font-weight: bold;
+            color: #0369a1;
+            font-size: 1rem;
+        }
+
+        .tp-item input {
+            padding: 10px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #ffffff;
+            color: #1f2937;
+        }
+
+        .tp-item input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .weight-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .tp-results {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #10b981;
+        }
+
+        .tp-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .avg-tp, .rr-ratio {
+            padding: 15px;
+            background: linear-gradient(45deg, #0ea5e9, #10b981);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .tp-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .tp-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tp-breakdown {
+            display: grid;
+            gap: 10px;
+        }
+
+        .tp-level {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 8px;
+            font-size: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .tp-level span:first-child {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .tp-level span:last-child {
+            color: #0369a1;
+            font-weight: bold;
+        }
+
+        .auto-note {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            border-left: 5px solid #d97706;
+            font-weight: 500;
+            border: 1px solid #fcd34d;
+        }
+
+        .crypto-tips {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 2px solid #0ea5e9;
+        }
+
+        .tips-title {
+            color: #0369a1;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .tip-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid #0ea5e9;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .tip-card h4 {
+            color: #0369a1;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .tip-card p {
+            color: #374151;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .mode-long .category {
+            border-left-color: #10b981;
+        }
+
+        .mode-short .category {
+            border-left-color: #ef4444;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .score-display {
+                font-size: 3rem;
+            }
+
+            .trading-mode {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .tp-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Crypto Trading Signal Scoring</h1>
+            <p>ระบบให้คะแนนสัญญาณการเทรดคริปโตแกะมืออาชีพ</p>
+            
+            <div class="trading-mode">
+                <div class="mode-btn active" onclick="setMode('long')">📈 LONG SIGNALS</div>
+                <div class="mode-btn" onclick="setMode('short')">📉 SHORT SIGNALS</div>
+            </div>
+        </div>
+
+        <div class="main-content" id="mainContent">
+            <!-- Signal Scoring Section -->
+            <div class="scoring-section">
+                <h2 class="section-title">📊 Signal Scoring System</h2>
+                
+                <div class="two-column">
+                    <!-- Long Scoring -->
+                    <div class="mode-content mode-long">
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">🎯 TREND CONFIRMATION</div>
+                                <div class="category-weight">30%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Dow Theory Bullish</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Price > EMA 20 Daily</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                        </div>
+
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">📈 MOMENTUM</div>
+                                <div class="category-weight">40%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">MACD 4H Signal Cross UP</div>
+                                <div class="signal-points">2</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">RSI > EMA RSI 14 (4H)</div>
+                                <div class="signal-points">2</div>
+                            </div>
+                        </div>
+
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">📍 ENTRY TIMING</div>
+                                <div class="category-weight">30%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Volume > 20-period Avg</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">No Bearish Divergence</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Price > EMA 5 (4H)</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Short Scoring -->
+                    <div class="mode-content mode-short hidden">
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">🎯 TREND CONFIRMATION</div>
+                                <div class="category-weight">30%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Dow Theory Bearish</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Price < EMA 20 Daily</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                        </div>
+
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">📈 MOMENTUM</div>
+                                <div class="category-weight">40%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">MACD 4H Signal Cross DOWN</div>
+                                <div class="signal-points">2</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">RSI < EMA RSI 14 (4H)</div>
+                                <div class="signal-points">2</div>
+                            </div>
+                        </div>
+
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">📍 ENTRY TIMING</div>
+                                <div class="category-weight">30%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Volume > 20-period Avg</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">No Bullish Divergence</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Price < EMA 5 (4H)</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculator Section -->
+                    <div class="calculator">
+                        <h2 class="section-title">🧮 Score Calculator</h2>
+                        
+                        <div class="input-group">
+                            <label for="cryptoPair">Crypto Pair:</label>
+                            <select id="cryptoPair">
+                                <option value="">เลือก Crypto Pair</option>
+                                <option value="BTC/USDT">BTC/USDT</option>
+                                <option value="ETH/USDT">ETH/USDT</option>
+                                <option value="BNB/USDT">BNB/USDT</option>
+                                <option value="ADA/USDT">ADA/USDT</option>
+                                <option value="SOL/USDT">SOL/USDT</option>
+                                <option value="DOT/USDT">DOT/USDT</option>
+                                <option value="MATIC/USDT">MATIC/USDT</option>
+                                <option value="AVAX/USDT">AVAX/USDT</option>
+                                <option value="LINK/USDT">LINK/USDT</option>
+                                <option value="UNI/USDT">UNI/USDT</option>
+                                <option value="custom">อื่นๆ (พิมพ์เอง)</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group" id="customPairGroup" style="display:none;">
+                            <label for="customPair">พิมพ์ Crypto Pair:</label>
+                            <input type="text" id="customPair" placeholder="เช่น DOGE/USDT, XRP/USDT">
+                        </div>
+
+                        <!-- Long Checkboxes -->
+                        <div class="checkbox-group mode-content mode-long">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_trend1" data-points="1.5">
+                                <label for="long_trend1">Dow Theory Bullish</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_trend2" data-points="1.5">
+                                <label for="long_trend2">Price > EMA 20 Daily</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_momentum1" data-points="2">
+                                <label for="long_momentum1">MACD Signal Cross UP</label>
+                                <div class="checkbox-points">2</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_momentum2" data-points="2">
+                                <label for="long_momentum2">RSI > EMA RSI 14</label>
+                                <div class="checkbox-points">2</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_timing1" data-points="1">
+                                <label for="long_timing1">Volume > Average</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_timing2" data-points="1">
+                                <label for="long_timing2">No Bearish Divergence</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_timing3" data-points="1">
+                                <label for="long_timing3">Price > EMA 5 (4H)</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                        </div>
+
+                        <!-- Short Checkboxes -->
+                        <div class="checkbox-group mode-content mode-short hidden">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_trend1" data-points="1.5">
+                                <label for="short_trend1">Dow Theory Bearish</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_trend2" data-points="1.5">
+                                <label for="short_trend2">Price < EMA 20 Daily</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_momentum1" data-points="2">
+                                <label for="short_momentum1">MACD Signal Cross DOWN</label>
+                                <div class="checkbox-points">2</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_momentum2" data-points="2">
+                                <label for="short_momentum2">RSI < EMA RSI 14</label>
+                                <div class="checkbox-points">2</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_timing1" data-points="1">
+                                <label for="short_timing1">Volume > Average</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_timing2" data-points="1">
+                                <label for="short_timing2">No Bullish Divergence</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_timing3" data-points="1">
+                                <label for="short_timing3">Price < EMA 5 (4H)</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-reset" onclick="resetCalculator()">🔄 รีเซ็ต</button>
+                            <button class="btn btn-long mode-content mode-long" onclick="setMode('long')">📈 LONG</button>
+                            <button class="btn btn-short mode-content mode-long" onclick="setMode('short')">📉 SHORT</button>
+                            <button class="btn btn-long mode-content mode-short hidden" onclick="setMode('long')">📈 LONG</button>
+                            <button class="btn btn-short mode-content mode-short" onclick="setMode('short')">📉 SHORT</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cut Loss Conditions -->
+            <div class="scoring-section calculator">
+                <h2 class="section-title">🛑 Cut Loss Conditions Monitor</h2>
+                
+                <div class="auto-note">
+                    <strong>⚠️ Cut Loss Alert:</strong> ติ๊กเลือกเงื่อนไขที่เกิดขึ้น ระบบจะคำนวณ Cut Loss Score ตามน้ำหนัก<br>
+                    <strong>🎯 Risk Management:</strong> Score ≥50% = พิจารณา Cut Loss | Score ≥70% = ต้อง Cut Loss ทันที
+                </div>
+
+                <div class="two-column">
+                    <div>
+                        <h3 style="color: #ef4444; margin-bottom: 15px; font-weight: bold;">📈 Price Action (60%)</h3>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item" style="border-color: #ef4444;">
+                                <input type="checkbox" id="cutloss_horizontal" data-severity="critical" data-weight="35">
+                                <label for="cutloss_horizontal">หลุดแนวรับ S/R - Critical</label>
+                                <div class="checkbox-points" style="background: linear-gradient(45deg, #ef4444, #dc2626);">35%</div>
+                            </div>
+                            <div class="checkbox-item" style="border-color: #ef4444;">
+                                <input type="checkbox" id="cutloss_trendline" data-severity="high" data-weight="25">
+                                <label for="cutloss_trendline">หลุดเทรนไลน์ - High Risk</label>
+                                <div class="checkbox-points" style="background: linear-gradient(45deg, #ef4444, #dc2626);">25%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 style="color: #f97316; margin-bottom: 15px; font-weight: bold;">📊 Technical Indicators (25%)</h3>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item" style="border-color: #f97316;">
+                                <input type="checkbox" id="cutloss_rsi" data-severity="medium" data-weight="10">
+                                <label for="cutloss_rsi">RSI < EMA RSI 14 - Medium</label>
+                                <div class="checkbox-points" style="background: linear-gradient(45deg, #f97316, #ea580c);">10%</div>
+                            </div>
+                            <div class="checkbox-item" style="border-color: #f97316;">
+                                <input type="checkbox" id="cutloss_macd" data-severity="medium" data-weight="10">
+                                <label for="cutloss_macd">MACD หดตัว/ลดลง - Medium</label>
+                                <div class="checkbox-points" style="background: linear-gradient(45deg, #f97316, #ea580c);">10%</div>
+                            </div>
+                            <div class="checkbox-item" style="border-color: #f59e0b;">
+                                <input type="checkbox" id="cutloss_ema5" data-severity="low" data-weight="5">
+                                <label for="cutloss_ema5">หลุด EMA 5 (4H) - Low</label>
+                                <div class="checkbox-points" style="background: linear-gradient(45deg, #f59e0b, #d97706);">5%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cutloss-results" id="cutlossResults" style="display: none;">
+                    <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 12px; color: white; margin-top: 20px;">
+                        <h3 style="margin-bottom: 15px;">🚨 Cut Loss Alert Status</h3>
+                        <div style="font-size: 2.5rem; font-weight: bold; margin: 15px 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);" id="alertLevel">SAFE</div>
+                        <div style="font-size: 1.8rem; margin-bottom: 15px; background: rgba(255,255,255,0.3); padding: 10px; border-radius: 10px;" id="cutlossScore">0%</div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px; font-size: 1.1rem; line-height: 1.5;" id="alertRecommendation">
+                            ยังไม่มีเงื่อนไขการ Cut Loss เกิดขึ้น
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 12px; border: 2px solid #ef4444;">
+                        <h4 style="color: #ef4444; margin-bottom: 15px; font-weight: bold;">📋 Active Conditions & Weights:</h4>
+                        <div id="activeConditions" style="display: grid; gap: 8px;">
+                            <div style="color: #6b7280;">ยังไม่มีเงื่อนไขใดที่เกิดขึ้น</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Position Size Calculator -->
+            <div class="scoring-section calculator">
+                <h2 class="section-title">💰 Position Size Calculator</h2>
+                
+                <div class="two-column">
+                    <div>
+                        <div class="input-group">
+                            <label for="riskAmount">ยอมรับขาดทุน (USDT):</label>
+                            <input type="number" id="riskAmount" placeholder="เช่น 250" step="0.01" oninput="calculatePosition()">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="stopLossPercent">Stop Loss (%):</label>
+                            <input type="number" id="stopLossPercent" placeholder="เช่น 2.5" step="0.1" oninput="calculatePosition()">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="positionSize">POSITION ที่ซื้อได้ (USDT):</label>
+                            <input type="number" id="positionSize" placeholder="คำนวณอัตโนมัติ" readonly>
+                        </div>
+                    </div>
+
+                    <div class="position-results" id="positionResults" style="display: none;">
+                        <div class="result-card">
+                            <h4>📊 Position Size</h4>
+                            <div class="position-size" id="positionSizeDisplay">0 USDT</div>
+                        </div>
+                        
+                        <div class="result-details">
+                            <div class="detail-item">
+                                <span>ยอมรับขาดทุน:</span>
+                                <span id="displayRiskAmount">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Stop Loss:</span>
+                                <span id="displayStopLoss">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Position Size:</span>
+                                <span id="displayPositionSize">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>แนะนำ Position:</span>
+                                <span id="recommendedPosition">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Take Profit Calculator -->
+            <div class="scoring-section calculator">
+                <h2 class="section-title">🎯 Take Profit Calculator</h2>
+                
+                <div class="auto-note">
+                    <strong>📋 Default Values:</strong> TP จะตั้งค่า default ตาม Stop Loss % (SL×1, SL×1.5, SL×2, SL×2.5, SL×3) แต่ยังปรับแต่งได้<br>
+                    <strong>📊 Weight:</strong> TP เริ่มต้นที่ 15%, 15%, 20%, 25%, 25% แต่ยังปรับแต่งได้ตามต้องการ
+                </div>
+
+                <div class="tp-grid">
+                    <div class="tp-item">
+                        <label>TP1 (%) - R:R 1:1:</label>
+                        <input type="number" id="tp1" placeholder="SL × 1.0" step="0.1" oninput="calculateTakeProfit()">
+                        <label>Weight (%):</label>
+                        <input type="number" id="weight1" placeholder="15" step="1" oninput="calculateTakeProfit()">
+                    </div>
+                    <div class="tp-item">
+                        <label>TP2 (%) - R:R 1:1.5:</label>
+                        <input type="number" id="tp2" placeholder="SL × 1.5" step="0.1" oninput="calculateTakeProfit()">
+                        <label>Weight (%):</label>
+                        <input type="number" id="weight2" placeholder="15" step="1" oninput="calculateTakeProfit()">
+                    </div>
+                    <div class="tp-item">
+                        <label>TP3 (%) - R:R 1:2:</label>
+                        <input type="number" id="tp3" placeholder="SL × 2.0" step="0.1" oninput="calculateTakeProfit()">
+                        <label>Weight (%):</label>
+                        <input type="number" id="weight3" placeholder="20" step="1" oninput="calculateTakeProfit()">
+                    </div>
+                    <div class="tp-item">
+                        <label>TP4 (%) - R:R 1:2.5:</label>
+                        <input type="number" id="tp4" placeholder="SL × 2.5" step="0.1" oninput="calculateTakeProfit()">
+                        <label>Weight (%):</label>
+                        <input type="number" id="weight4" placeholder="25" step="1" oninput="calculateTakeProfit()">
+                    </div>
+                    <div class="tp-item">
+                        <label>TP5 (%) - R:R 1:3:</label>
+                        <input type="number" id="tp5" placeholder="SL × 3.0" step="0.1" oninput="calculateTakeProfit()">
+                        <label>Weight (%):</label>
+                        <input type="number" id="weight5" placeholder="25" step="1" oninput="calculateTakeProfit()">
+                    </div>
+                </div>
+
+                <div class="tp-results" id="tpResults" style="display: none;">
+                    <div class="tp-summary">
+                        <div class="avg-tp">
+                            <div class="tp-label">TP เฉลี่ย</div>
+                            <div class="tp-value" id="averageTP">0%</div>
+                        </div>
+                        <div class="rr-ratio">
+                            <div class="tp-label">R:R Ratio เฉลี่ย</div>
+                            <div class="tp-value" id="rrRatio">0:0</div>
+                        </div>
+                    </div>
+                    
+                    <div class="tp-breakdown">
+                        <div class="tp-level">
+                            <span>TP1:</span>
+                            <span id="tp1Split">$0 (0%)</span>
+                        </div>
+                        <div class="tp-level">
+                            <span>TP2:</span>
+                            <span id="tp2Split">$0 (0%)</span>
+                        </div>
+                        <div class="tp-level">
+                            <span>TP3:</span>
+                            <span id="tp3Split">$0 (0%)</span>
+                        </div>
+                        <div class="tp-level">
+                            <span>TP4:</span>
+                            <span id="tp4Split">$0 (0%)</span>
+                        </div>
+                        <div class="tp-level">
+                            <span>TP5:</span>
+                            <span id="tp5Split">$0 (0%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Section -->
+            <div class="result-section">
+                <h2>📊 ผลการวิเคราะห์</h2>
+                <div class="score-display" id="totalScore">0/10</div>
+                <div class="signal-strength" id="signalStrength">เลือกโหมดการเทรด</div>
+                <div class="recommendation" id="recommendation">
+                    เลือก LONG หรือ SHORT mode แล้วป้อนข้อมูลการวิเคราะห์ของคุณ
+                </div>
+            </div>
+
+            <!-- Crypto Tips -->
+            <div class="crypto-tips">
+                <h3 class="tips-title">🚀 Crypto Trading Tips</h3>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <h4>⏰ Best Trading Hours</h4>
+                        <p><strong>08:00-12:00 UTC:</strong> Europe active<br>
+                        <strong>13:00-17:00 UTC:</strong> US market overlap<br>
+                        <strong>21:00-01:00 UTC:</strong> Asia active</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>📊 Volume Analysis</h4>
+                        <p>คริปโตใช้ Volume Spike >200% แทน 150%<br>
+                        ระวัง Weekend Volume ที่มักต่ำกว่า Weekday<br>
+                        เช็ค Volume ทุก 4H timeframe</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>🎪 Key S/R Levels</h4>
+                        <p>Psychological levels ($50K, $60K, $70K)<br>
+                        Previous ATH/ATL levels<br>
+                        Major exchange liquidation zones</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>🛡️ Risk Management</h4>
+                        <p>Risk 1-3% per trade (higher volatility)<br>
+                        Stop Loss: EMA 5 (4H) or EMA 20 Daily<br>
+                        Take Profit: เร็วกว่าหุ้น (2-5 วัน)</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>📈 Signal Strength</h4>
+                        <p><strong>8-10:</strong> Strong Signal 🔥<br>
+                        <strong>6-7:</strong> Moderate Signal ⚡<br>
+                        <strong>&lt;6:</strong> Weak Signal ⚠️</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>🎯 Default TP Strategy</h4>
+                        <p><strong>TP1:</strong> SL × 1.0 (1:1 R:R) - 15%<br>
+                        <strong>TP2:</strong> SL × 1.5 (1:1.5 R:R) - 15%<br>
+                        <strong>TP3:</strong> SL × 2.0 (1:2 R:R) - 20%<br>
+                        <strong>TP4:</strong> SL × 2.5 (1:2.5 R:R) - 25%<br>
+                        <strong>TP5:</strong> SL × 3.0 (1:3 R:R) - 25%</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>🛑 Cut Loss Weight System</h4>
+                        <p><strong>Price Action (60%):</strong><br>
+                        • หลุดแนวรับ S/R - 35%<br>
+                        • หลุดเทรนไลน์ - 25%<br>
+                        <strong>Technical Indicators (25%):</strong><br>
+                        • RSI < EMA RSI 14 - 10%<br>
+                        • MACD หดตัว/ลดลง - 10%<br>
+                        • หลุด EMA 5 (4H) - 5%<br>
+                        <strong>Score ≥50%:</strong> พิจารณา Cut Loss<br>
+                        <strong>Score ≥70%:</strong> ต้อง Cut Loss ทันที!</p>
+                    </div>
+                    <div class="tip-card">
+                        <h4>⚠️ Important Notes</h4>
+                        <p>24/7 market - no gaps but watch thin liquidity<br>
+                        News impact faster than traditional markets<br>
+                        Always combine with S/R analysis<br>
+                        <strong>Cut Loss:</strong> วินัยสำคัญกว่ากำไร</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'long';
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update mode buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.mode-btn[onclick="setMode('${mode}')"]`).classList.add('active');
+            
+            // Show/hide content
+            document.querySelectorAll('.mode-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll(`.mode-${mode}`).forEach(el => el.classList.remove('hidden'));
+            
+            // Update container class for styling
+            document.getElementById('mainContent').className = `main-content mode-${mode}`;
+            
+            // Reset and update score
+            updateScore();
+            
+            // Set default values
+            setDefaultValues();
+            
+            // Recalculate position if data exists
+            calculatePosition();
+        }
+
+        function setDefaultValues() {
+            // Set default weight values if fields are empty
+            if (!document.getElementById('weight1').value) {
+                document.getElementById('weight1').value = '15';
+            }
+            if (!document.getElementById('weight2').value) {
+                document.getElementById('weight2').value = '15';
+            }
+            if (!document.getElementById('weight3').value) {
+                document.getElementById('weight3').value = '20';
+            }
+            if (!document.getElementById('weight4').value) {
+                document.getElementById('weight4').value = '25';
+            }
+            if (!document.getElementById('weight5').value) {
+                document.getElementById('weight5').value = '25';
+            }
+        }
+
+        function updateScore() {
+            let totalScore = 0;
+            const activeCheckboxes = document.querySelectorAll(`.mode-${currentMode} input[type="checkbox"]:checked`);
+            
+            activeCheckboxes.forEach(checkbox => {
+                totalScore += parseFloat(checkbox.dataset.points);
+            });
+
+            document.getElementById('totalScore').textContent = totalScore.toFixed(1) + '/10';
+
+            let strength = '';
+            let recommendation = '';
+            let strengthColor = '';
+
+            if (totalScore >= 8) {
+                strength = currentMode === 'long' ? 'Strong LONG Signal 🔥' : 'Strong SHORT Signal 🔥';
+                recommendation = `สัญญาณแรงมาก! เหมาะสำหรับการเทรด ${currentMode.toUpperCase()} แต่อย่าลืม Risk Management และ S/R Analysis`;
+                strengthColor = '#10b981';
+            } else if (totalScore >= 6) {
+                strength = currentMode === 'long' ? 'Moderate LONG Signal ⚡' : 'Moderate SHORT Signal ⚡';
+                recommendation = `สัญญาณปานกลาง ใช้ความระมัดระวังเพิ่มเติม ลดขนาดการเทรด ${currentMode.toUpperCase()}`;
+                strengthColor = '#f59e0b';
+            } else if (totalScore > 0) {
+                strength = 'Weak Signal ⚠️';
+                recommendation = `สัญญาณอ่อน ไม่แนะนำให้เทรดในขณะนี้ รอสัญญาณที่ชัดเจนกว่า`;
+                strengthColor = '#ef4444';
+            } else {
+                strength = 'เลือกสัญญาณที่ตรงกับการวิเคราะห์';
+                recommendation = `เลือก ${currentMode.toUpperCase()} mode แล้วติ๊กเลือกสัญญาณที่ตรงกับการวิเคราะห์ของคุณ`;
+                strengthColor = '#6b7280';
+            }
+
+            document.getElementById('signalStrength').textContent = strength;
+            document.getElementById('signalStrength').style.color = strengthColor;
+            document.getElementById('recommendation').textContent = recommendation;
+
+            // Update score display color
+            const scoreDisplay = document.getElementById('totalScore');
+            scoreDisplay.style.color = strengthColor;
+        }
+
+        function updateCutLossStatus() {
+            const cutlossCheckboxes = document.querySelectorAll('input[id^="cutloss_"]:checked');
+            let totalScore = 0;
+            let activeConditions = [];
+            
+            cutlossCheckboxes.forEach(checkbox => {
+                const weight = parseFloat(checkbox.dataset.weight);
+                const severity = checkbox.dataset.severity;
+                const label = checkbox.nextElementSibling.textContent;
+                
+                totalScore += weight;
+                activeConditions.push({
+                    label: label,
+                    severity: severity,
+                    weight: weight
+                });
+            });
+            
+            // Determine alert level based on score
+            let alertLevel = '';
+            let alertLevelColor = '';
+            let recommendation = '';
+            
+            if (totalScore >= 70) {
+                alertLevel = 'CRITICAL ALERT 🚨';
+                alertLevelColor = '#dc2626';
+                recommendation = '⛔ ต้อง CUT LOSS ทันที! Cut Loss Score ≥70% = ความเสี่ยงสูงมาก อย่าปล่อยให้ขาดทุนมากกว่านี้';
+            } else if (totalScore >= 50) {
+                alertLevel = 'HIGH RISK ⚠️';
+                alertLevelColor = '#ef4444';
+                recommendation = '🔍 พิจารณา CUT LOSS อย่างจริงจัง! Cut Loss Score ≥50% = ควรออกจากตำแหน่งเพื่อปกป้องเงินทุน';
+            } else if (totalScore >= 30) {
+                alertLevel = 'CAUTION ⚡';
+                alertLevelColor = '#f97316';
+                recommendation = '⚠️ ระมัดระวัง! Cut Loss Score ≥30% = มีสัญญาณเตือน ติดตาม EMA และ S/R อย่างใกล้ชิด';
+            } else if (totalScore > 0) {
+                alertLevel = 'WATCH ⚡';
+                alertLevelColor = '#f59e0b';
+                recommendation = '👀 ติดตาม! Cut Loss Score <30% = มีสัญญาณเตือนเล็กน้อย เฝ้าระวังการเปลี่ยนแปลง';
+            } else {
+                alertLevel = 'SAFE ✅';
+                alertLevelColor = '#10b981';
+                recommendation = '✅ ยังปลอดภัย ไม่มีเงื่อนไขการ Cut Loss เกิดขึ้น แต่ยังคงต้องติดตามอย่างต่อเนื่อง';
+            }
+            
+            // Update display
+            document.getElementById('alertLevel').textContent = alertLevel;
+            document.getElementById('alertLevel').style.color = alertLevelColor;
+            document.getElementById('cutlossScore').textContent = `Cut Loss Score: ${totalScore.toFixed(0)}%`;
+            document.getElementById('alertRecommendation').textContent = recommendation;
+            
+            // Update active conditions list
+            const activeConditionsDiv = document.getElementById('activeConditions');
+            if (activeConditions.length === 0) {
+                activeConditionsDiv.innerHTML = '<div style="color: #6b7280;">ยังไม่มีเงื่อนไขใดที่เกิดขึ้น</div>';
+            } else {
+                activeConditionsDiv.innerHTML = activeConditions.map(condition => {
+                    let color = '';
+                    let icon = '';
+                    switch(condition.severity) {
+                        case 'critical': color = '#dc2626'; icon = '🚨'; break;
+                        case 'high': color = '#ef4444'; icon = '⚠️'; break;
+                        case 'medium': color = '#f97316'; icon = '⚡'; break;
+                        case 'low': color = '#f59e0b'; icon = '💡'; break;
+                    }
+                    return `<div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: ${color}15; border-left: 4px solid ${color}; border-radius: 6px;">
+                        <div style="display: flex; align-items: center;">
+                            <span style="margin-right: 8px;">${icon}</span>
+                            <span style="color: ${color}; font-weight: 500;">${condition.label}</span>
+                        </div>
+                        <span style="background: ${color}; color: white; padding: 4px 8px; border-radius: 8px; font-weight: bold; font-size: 0.9rem;">${condition.weight}%</span>
+                    </div>`;
+                }).join('');
+            }
+            
+            // Show/hide results
+            if (totalScore > 0) {
+                document.getElementById('cutlossResults').style.display = 'block';
+            } else {
+                document.getElementById('cutlossResults').style.display = 'none';
+            }
+        }
+
+        function calculatePosition() {
+            const riskAmount = parseFloat(document.getElementById('riskAmount').value);
+            const stopLossPercent = parseFloat(document.getElementById('stopLossPercent').value);
+
+            if (!riskAmount || !stopLossPercent || riskAmount <= 0 || stopLossPercent <= 0) {
+                document.getElementById('positionSize').value = '';
+                document.getElementById('positionResults').style.display = 'none';
+                return;
+            }
+
+            // Calculate position size: Risk Amount / Stop Loss %
+            const positionSizeValue = riskAmount / (stopLossPercent / 100);
+            
+            // Update the POSITION input field
+            document.getElementById('positionSize').value = positionSizeValue.toFixed(2);
+            
+            // Calculate recommended position (typically 50-75% of max position)
+            const recommendedMin = positionSizeValue * 0.5;
+            const recommendedMax = positionSizeValue * 0.75;
+
+            // Update display in results section
+            document.getElementById('positionSizeDisplay').textContent = `${positionSizeValue.toFixed(2)} USDT`;
+            document.getElementById('displayRiskAmount').textContent = `${riskAmount.toFixed(2)} USDT`;
+            document.getElementById('displayStopLoss').textContent = `${stopLossPercent}%`;
+            document.getElementById('displayPositionSize').textContent = `${positionSizeValue.toFixed(2)} USDT`;
+            document.getElementById('recommendedPosition').textContent = `${recommendedMin.toFixed(0)}-${recommendedMax.toFixed(0)} USDT`;
+            
+            document.getElementById('positionResults').style.display = 'block';
+            
+            // Auto-update default TP values based on Stop Loss
+            updateDefaultTPValues(stopLossPercent);
+            
+            // Calculate TP if values exist
+            calculateTakeProfit();
+        }
+
+        function updateDefaultTPValues(stopLossPercent) {
+            // Update default TP values based on Stop Loss ONLY if field is empty
+            if (!document.getElementById('tp1').value) {
+                document.getElementById('tp1').value = (stopLossPercent * 1.0).toFixed(2);
+            }
+            if (!document.getElementById('tp2').value) {
+                document.getElementById('tp2').value = (stopLossPercent * 1.5).toFixed(2);
+            }
+            if (!document.getElementById('tp3').value) {
+                document.getElementById('tp3').value = (stopLossPercent * 2.0).toFixed(2);
+            }
+            if (!document.getElementById('tp4').value) {
+                document.getElementById('tp4').value = (stopLossPercent * 2.5).toFixed(2);
+            }
+            if (!document.getElementById('tp5').value) {
+                document.getElementById('tp5').value = (stopLossPercent * 3.0).toFixed(2);
+            }
+        }
+
+        function calculateTakeProfit() {
+            const positionSize = parseFloat(document.getElementById('positionSize').value);
+            const stopLoss = parseFloat(document.getElementById('stopLossPercent').value);
+            
+            if (!positionSize || !stopLoss) {
+                document.getElementById('tpResults').style.display = 'none';
+                return;
+            }
+
+            // Get TP values
+            const tp1 = parseFloat(document.getElementById('tp1').value) || 0;
+            const tp2 = parseFloat(document.getElementById('tp2').value) || 0;
+            const tp3 = parseFloat(document.getElementById('tp3').value) || 0;
+            const tp4 = parseFloat(document.getElementById('tp4').value) || 0;
+            const tp5 = parseFloat(document.getElementById('tp5').value) || 0;
+            
+            // Get weight values
+            const weight1 = parseFloat(document.getElementById('weight1').value) || 0;
+            const weight2 = parseFloat(document.getElementById('weight2').value) || 0;
+            const weight3 = parseFloat(document.getElementById('weight3').value) || 0;
+            const weight4 = parseFloat(document.getElementById('weight4').value) || 0;
+            const weight5 = parseFloat(document.getElementById('weight5').value) || 0;
+            
+            if (tp1 === 0 && tp2 === 0 && tp3 === 0 && tp4 === 0 && tp5 === 0) {
+                document.getElementById('tpResults').style.display = 'none';
+                return;
+            }
+            
+            // Calculate weighted average
+            const weights = [weight1/100, weight2/100, weight3/100, weight4/100, weight5/100];
+            const tpValues = [tp1, tp2, tp3, tp4, tp5];
+            
+            let weightedTP = 0;
+            let totalWeight = 0;
+            
+            for (let i = 0; i < 5; i++) {
+                if (tpValues[i] > 0 && weights[i] > 0) {
+                    weightedTP += tpValues[i] * weights[i];
+                    totalWeight += weights[i];
+                }
+            }
+            
+            if (totalWeight > 0) {
+                weightedTP = weightedTP / totalWeight;
+            }
+            
+            // Calculate R:R Ratio
+            const rrRatio = totalWeight > 0 ? weightedTP / stopLoss : 0;
+            
+            // Calculate position splits
+            const tp1Split = tp1 > 0 ? positionSize * (weight1/100) : 0;
+            const tp2Split = tp2 > 0 ? positionSize * (weight2/100) : 0;
+            const tp3Split = tp3 > 0 ? positionSize * (weight3/100) : 0;
+            const tp4Split = tp4 > 0 ? positionSize * (weight4/100) : 0;
+            const tp5Split = tp5 > 0 ? positionSize * (weight5/100) : 0;
+            
+            // Update display
+            document.getElementById('averageTP').textContent = `${weightedTP.toFixed(2)}%`;
+            document.getElementById('rrRatio').textContent = `1:${rrRatio.toFixed(2)}`;
+            
+            document.getElementById('tp1Split').textContent = tp1 > 0 ? `${tp1Split.toFixed(0)} USDT (${tp1.toFixed(2)}%)` : 'ไม่ใช้';
+            document.getElementById('tp2Split').textContent = tp2 > 0 ? `${tp2Split.toFixed(0)} USDT (${tp2.toFixed(2)}%)` : 'ไม่ใช้';
+            document.getElementById('tp3Split').textContent = tp3 > 0 ? `${tp3Split.toFixed(0)} USDT (${tp3.toFixed(2)}%)` : 'ไม่ใช้';
+            document.getElementById('tp4Split').textContent = tp4 > 0 ? `${tp4Split.toFixed(0)} USDT (${tp4.toFixed(2)}%)` : 'ไม่ใช้';
+            document.getElementById('tp5Split').textContent = tp5 > 0 ? `${tp5Split.toFixed(0)} USDT (${tp5.toFixed(2)}%)` : 'ไม่ใช้';
+            
+            document.getElementById('tpResults').style.display = 'block';
+        }
+
+        function resetCalculator() {
+            // Reset all checkboxes (trading signals)
+            document.querySelectorAll('input[type="checkbox"][id^="long_"], input[type="checkbox"][id^="short_"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Reset Cut Loss checkboxes
+            document.querySelectorAll('input[type="checkbox"][id^="cutloss_"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Reset form inputs
+            const elements = [
+                'cryptoPair', 'customPair', 'riskAmount', 'stopLossPercent', 
+                'positionSize', 'tp1', 'tp2', 'tp3', 'tp4', 'tp5',
+                'weight1', 'weight2', 'weight3', 'weight4', 'weight5'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.value = '';
+            });
+            
+            // Hide sections
+            const sections = ['customPairGroup', 'positionResults', 'tpResults', 'cutlossResults'];
+            sections.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.style.display = 'none';
+            });
+            
+            updateScore();
+            updateCutLossStatus();
+        }
+
+        // Handle custom pair selection
+        document.getElementById('cryptoPair').addEventListener('change', function() {
+            const customGroup = document.getElementById('customPairGroup');
+            if (this.value === 'custom') {
+                customGroup.style.display = 'block';
+            } else {
+                customGroup.style.display = 'none';
+            }
+        });
+
+        // Add event listeners to all checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            if (checkbox.id.startsWith('cutloss_')) {
+                checkbox.addEventListener('change', updateCutLossStatus);
+            } else {
+                checkbox.addEventListener('change', updateScore);
+            }
+        });
+
+        // Initialize
+        setMode('long');
+        setDefaultValues();
+        updateCutLossStatus();
+    </script>
+</body>
+</html>
