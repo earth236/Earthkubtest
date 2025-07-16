@@ -1053,7 +1053,7 @@
                     <div class="strategy-buttons">
                         <button class="strategy-btn" data-strategy="1" onclick="applyStrategy(1)">
                             🥇 STRATEGY 1<br>
-                            <small>Conservative Growth (RR: 2.15)</small>
+                            <small>Conservative Growth (RR: 2.00)</small>
                         </button>
                         <button class="strategy-btn active" data-strategy="2" onclick="applyStrategy(2)">
                             🥈 STRATEGY 2<br>
@@ -1182,8 +1182,8 @@
                     </div>
                     <div class="tip-card">
                         <h4>🎯 TP Strategy Options</h4>
-                        <p><strong>🥇 STRATEGY 1 - Conservative Growth (RR: 2.15):</strong><br>
-                        TP1: 15% | TP2: 15% | TP3: 20% | TP4: 25% | TP5: 25%<br><br>
+                        <p><strong>🥇 STRATEGY 1 - Conservative Growth (RR: 2.00):</strong><br>
+                        TP1: 20% | TP2: 20% | TP3: 20% | TP4: 20% | TP5: 20%<br><br>
                         <strong>🥈 STRATEGY 2 - Aggressive Growth (RR: 2.25) [Default]:</strong><br>
                         TP1: 10% | TP2: 15% | TP3: 20% | TP4: 25% | TP5: 30%<br><br>
                         <strong>🥉 STRATEGY 3 - Let Profit Run (RR: 2.35):</strong><br>
@@ -1269,11 +1269,11 @@
             // Apply strategy weights
             switch(strategyNumber) {
                 case 1: // Conservative Growth
-                    document.getElementById('weight1').value = '15';
-                    document.getElementById('weight2').value = '15';
+                    document.getElementById('weight1').value = '20';
+                    document.getElementById('weight2').value = '20';
                     document.getElementById('weight3').value = '20';
-                    document.getElementById('weight4').value = '25';
-                    document.getElementById('weight5').value = '25';
+                    document.getElementById('weight4').value = '20';
+                    document.getElementById('weight5').value = '20';
                     break;
                 case 2: // Aggressive Growth (Default)
                     document.getElementById('weight1').value = '10';
@@ -1552,22 +1552,34 @@
             // Calculate R:R Ratio
             const rrRatio = totalWeight > 0 ? weightedTP / stopLoss : 0;
             
-            // Calculate position splits
+            // Calculate position splits and profits
             const tp1Split = tp1 > 0 ? positionSize * (weight1/100) : 0;
             const tp2Split = tp2 > 0 ? positionSize * (weight2/100) : 0;
             const tp3Split = tp3 > 0 ? positionSize * (weight3/100) : 0;
             const tp4Split = tp4 > 0 ? positionSize * (weight4/100) : 0;
             const tp5Split = tp5 > 0 ? positionSize * (weight5/100) : 0;
             
+            // Calculate profits from each TP level
+            const tp1Profit = tp1Split * (tp1/100);
+            const tp2Profit = tp2Split * (tp2/100);
+            const tp3Profit = tp3Split * (tp3/100);
+            const tp4Profit = tp4Split * (tp4/100);
+            const tp5Profit = tp5Split * (tp5/100);
+            
             // Update display
             document.getElementById('averageTP').textContent = `${weightedTP.toFixed(2)}%`;
             document.getElementById('rrRatio').textContent = `1:${rrRatio.toFixed(2)}`;
             
-            document.getElementById('tp1Split').textContent = tp1 > 0 ? `${tp1Split.toFixed(0)} USDT (${tp1.toFixed(2)}%)` : 'ไม่ใช้';
-            document.getElementById('tp2Split').textContent = tp2 > 0 ? `${tp2Split.toFixed(0)} USDT (${tp2.toFixed(2)}%)` : 'ไม่ใช้';
-            document.getElementById('tp3Split').textContent = tp3 > 0 ? `${tp3Split.toFixed(0)} USDT (${tp3.toFixed(2)}%)` : 'ไม่ใช้';
-            document.getElementById('tp4Split').textContent = tp4 > 0 ? `${tp4Split.toFixed(0)} USDT (${tp4.toFixed(2)}%)` : 'ไม่ใช้';
-            document.getElementById('tp5Split').textContent = tp5 > 0 ? `${tp5Split.toFixed(0)} USDT (${tp5.toFixed(2)}%)` : 'ไม่ใช้';
+            document.getElementById('tp1Split').textContent = tp1 > 0 ? 
+                `${tp1Split.toFixed(0)} USDT (${tp1.toFixed(2)}%) → กำไร ${tp1Profit.toFixed(0)} USDT` : 'ไม่ใช้';
+            document.getElementById('tp2Split').textContent = tp2 > 0 ? 
+                `${tp2Split.toFixed(0)} USDT (${tp2.toFixed(2)}%) → กำไร ${tp2Profit.toFixed(0)} USDT` : 'ไม่ใช้';
+            document.getElementById('tp3Split').textContent = tp3 > 0 ? 
+                `${tp3Split.toFixed(0)} USDT (${tp3.toFixed(2)}%) → กำไร ${tp3Profit.toFixed(0)} USDT` : 'ไม่ใช้';
+            document.getElementById('tp4Split').textContent = tp4 > 0 ? 
+                `${tp4Split.toFixed(0)} USDT (${tp4.toFixed(2)}%) → กำไร ${tp4Profit.toFixed(0)} USDT` : 'ไม่ใช้';
+            document.getElementById('tp5Split').textContent = tp5 > 0 ? 
+                `${tp5Split.toFixed(0)} USDT (${tp5.toFixed(2)}%) → กำไร ${tp5Profit.toFixed(0)} USDT` : 'ไม่ใช้';
             
             document.getElementById('tpResults').style.display = 'block';
         }
