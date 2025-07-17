@@ -56,51 +56,84 @@
             overflow: hidden;
             box-shadow: 0 0 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.1);
             transition: transform 4s cubic-bezier(0.23, 1, 0.32, 1);
+            background: conic-gradient(
+                from 0deg,
+                #e74c3c 0deg 60deg,
+                #3498db 60deg 120deg,
+                #2ecc71 120deg 180deg,
+                #f39c12 180deg 240deg,
+                #9b59b6 240deg 300deg,
+                #1abc9c 300deg 360deg
+            );
         }
 
         .slice {
             position: absolute;
             width: 50%;
             height: 50%;
-            transform-origin: right bottom;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.9rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
-            border-right: 2px solid rgba(255,255,255,0.3);
-            border-bottom: 2px solid rgba(255,255,255,0.3);
+            transform-origin: 100% 100%;
+            pointer-events: none;
         }
 
         .slice:nth-child(1) {
-            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
             transform: rotate(0deg);
         }
 
         .slice:nth-child(2) {
-            background: linear-gradient(45deg, #4ECDC4, #45B7AF);
             transform: rotate(60deg);
         }
 
         .slice:nth-child(3) {
-            background: linear-gradient(45deg, #45B7D1, #3A9BC1);
             transform: rotate(120deg);
         }
 
         .slice:nth-child(4) {
-            background: linear-gradient(45deg, #FFA726, #FF9800);
             transform: rotate(180deg);
         }
 
         .slice:nth-child(5) {
-            background: linear-gradient(45deg, #AB47BC, #9C27B0);
             transform: rotate(240deg);
         }
 
         .slice:nth-child(6) {
-            background: linear-gradient(45deg, #66BB6A, #4CAF50);
             transform: rotate(300deg);
+        }
+
+        /* ปรับตำแหน่งข้อความแต่ละช่องให้อยู่กึ่งกลาง */
+        .slice:nth-child(1) .slice-text {
+            top: 30%;
+            left: 70%;
+            transform: translate(-50%, -50%) rotate(30deg);
+        }
+
+        .slice:nth-child(2) .slice-text {
+            top: 30%;
+            left: 70%;
+            transform: translate(-50%, -50%) rotate(30deg);
+        }
+
+        .slice:nth-child(3) .slice-text {
+            top: 30%;
+            left: 70%;
+            transform: translate(-50%, -50%) rotate(30deg);
+        }
+
+        .slice:nth-child(4) .slice-text {
+            top: 30%;
+            left: 70%;
+            transform: translate(-50%, -50%) rotate(30deg);
+        }
+
+        .slice:nth-child(5) .slice-text {
+            top: 30%;
+            left: 70%;
+            transform: translate(-50%, -50%) rotate(30deg);
+        }
+
+        .slice:nth-child(6) .slice-text {
+            top: 30%;
+            left: 70%;
+            transform: translate(-50%, -50%) rotate(30deg);
         }
 
         .center-circle {
@@ -189,14 +222,38 @@
             line-height: 1.6;
         }
 
-        .history {
+        .stats, .history {
             margin-top: 2rem;
             text-align: left;
         }
 
-        .history h3 {
+        .stats h3, .history h3 {
             margin-bottom: 10px;
             color: #f39c12;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-bar {
+            width: 60%;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .stat-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            transition: width 0.5s ease;
         }
 
         .history-item {
@@ -289,6 +346,17 @@
             <p>ปล่อยให้โชคชะตาเป็นตัวตัดสินให้คุณ</p>
         </div>
 
+        <div class="stats">
+            <h3>📊 สถิติการสุ่ม</h3>
+            <div id="statsDisplay">
+                <p style="text-align: center; color: #bdc3c7;">ยังไม่มีข้อมูลสถิติ</p>
+            </div>
+            <div style="margin-top: 15px;">
+                <button class="spin-btn" onclick="testSpin(100)" style="font-size: 0.9rem; padding: 10px 20px;">🧪 ทดสอบ 100 รอบ</button>
+                <button class="spin-btn" onclick="resetStats()" style="font-size: 0.9rem; padding: 10px 20px; background: linear-gradient(45deg, #95a5a6, #7f8c8d);">🔄 รีเซ็ต</button>
+            </div>
+        </div>
+
         <div class="history">
             <h3>📋 ประวัติการหมุน</h3>
             <div id="historyList">
@@ -333,6 +401,29 @@
 
         let isSpinning = false;
         let history = [];
+        let stats = {};
+
+        // กำหนดน้ำหนักสำหรับแต่ละสถานที่
+        const weights = [12, 12, 12, 12, 40, 12]; // ภูเก็ต, เกาะสมุย, เชียงใหม่, พัทยา, เขาใหญ่, อยุธยา
+        
+        // เริ่มต้นสถิติ
+        places.forEach(place => {
+            stats[place.name] = 0;
+        });
+
+        // ฟังก์ชั่นสุ่มแบบมีน้ำหนัก
+        function weightedRandomSelect() {
+            const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+            let random = Math.random() * totalWeight;
+            
+            for (let i = 0; i < weights.length; i++) {
+                random -= weights[i];
+                if (random <= 0) {
+                    return i;
+                }
+            }
+            return weights.length - 1; // fallback
+        }
 
         function spinWheel() {
             if (isSpinning) return;
@@ -355,10 +446,8 @@
             playSpinSound();
 
             setTimeout(() => {
-                // คำนวณผลลัพธ์
-                const normalizedDegree = (360 - (totalDegree % 360)) % 360;
-                const sliceAngle = 360 / 6;
-                const selectedIndex = Math.floor(normalizedDegree / sliceAngle);
+                // ใช้ weighted random แทนการคำนวณจากองศา
+                const selectedIndex = weightedRandomSelect();
                 const selectedPlace = places[selectedIndex];
 
                 showResult(selectedPlace);
@@ -399,7 +488,72 @@
                 history = history.slice(0, 5);
             }
 
+            // อัพเดทสถิติ
+            stats[place.name]++;
+            updateStatsDisplay();
             updateHistoryDisplay();
+        }
+
+        function updateStatsDisplay() {
+            const statsDisplay = document.getElementById('statsDisplay');
+            const totalSpins = Object.values(stats).reduce((sum, count) => sum + count, 0);
+            
+            if (totalSpins === 0) {
+                statsDisplay.innerHTML = '<p style="text-align: center; color: #bdc3c7;">ยังไม่มีข้อมูลสถิติ</p>';
+                return;
+            }
+
+            const sortedStats = Object.entries(stats)
+                .map(([name, count], index) => {
+                    const percentage = ((count / totalSpins) * 100).toFixed(1);
+                    const place = places.find(p => p.name === name);
+                    const placeIndex = places.findIndex(p => p.name === name);
+                    const expectedPercentage = weights[placeIndex];
+                    return { name, count, percentage, emoji: place.emoji, expected: expectedPercentage };
+                })
+                .sort((a, b) => b.count - a.count);
+
+            statsDisplay.innerHTML = `
+                <div style="margin-bottom: 15px; text-align: center;">
+                    <strong>จำนวนครั้งทั้งหมด: ${totalSpins} ครั้ง</strong><br>
+                    <small>🏞️ เขาใหญ่: 40% | อื่นๆ: 12% ต่อสถานที่</small>
+                </div>
+                ${sortedStats.map(item => `
+                    <div class="stat-item">
+                        <span><strong>${item.emoji} ${item.name}</strong></span>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="stat-bar">
+                                <div class="stat-fill" style="width: ${Math.min(item.percentage * 2.5, 100)}%"></div>
+                            </div>
+                            <span>${item.count} ครั้ง (${item.percentage}% | เป้า ${item.expected}%)</span>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        function testSpin(rounds) {
+            if (isSpinning) return;
+            
+            const originalSpinning = isSpinning;
+            isSpinning = true;
+            
+            for (let i = 0; i < rounds; i++) {
+                // ใช้ weighted random selection
+                const selectedIndex = weightedRandomSelect();
+                const selectedPlace = places[selectedIndex];
+                stats[selectedPlace.name]++;
+            }
+            
+            updateStatsDisplay();
+            isSpinning = originalSpinning;
+        }
+
+        function resetStats() {
+            places.forEach(place => {
+                stats[place.name] = 0;
+            });
+            updateStatsDisplay();
         }
 
         function updateHistoryDisplay() {
