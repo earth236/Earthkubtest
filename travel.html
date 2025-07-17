@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>กงล้อเลือกสถานที่ท่องเที่ยว</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(255,255,255,0.1); }
+            to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(255,255,255,0.3); }
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto 3rem auto;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.1);
+            transition: transform 4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .slice {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            transform-origin: right bottom;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            border-right: 2px solid rgba(255,255,255,0.3);
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .slice:nth-child(1) {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            transform: rotate(0deg);
+        }
+
+        .slice:nth-child(2) {
+            background: linear-gradient(45deg, #4ECDC4, #45B7AF);
+            transform: rotate(60deg);
+        }
+
+        .slice:nth-child(3) {
+            background: linear-gradient(45deg, #45B7D1, #3A9BC1);
+            transform: rotate(120deg);
+        }
+
+        .slice:nth-child(4) {
+            background: linear-gradient(45deg, #FFA726, #FF9800);
+            transform: rotate(180deg);
+        }
+
+        .slice:nth-child(5) {
+            background: linear-gradient(45deg, #AB47BC, #9C27B0);
+            transform: rotate(240deg);
+        }
+
+        .slice:nth-child(6) {
+            background: linear-gradient(45deg, #66BB6A, #4CAF50);
+            transform: rotate(300deg);
+        }
+
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 30px solid #e74c3c;
+            z-index: 10;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+        }
+
+        .controls {
+            margin-bottom: 2rem;
+        }
+
+        .spin-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .spin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+        }
+
+        .spin-btn:active {
+            transform: translateY(0);
+        }
+
+        .spin-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .result h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #f39c12;
+        }
+
+        .result p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .history {
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .history h3 {
+            margin-bottom: 10px;
+            color: #f39c12;
+        }
+
+        .history-item {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border-left: 4px solid #f39c12;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f39c12;
+            pointer-events: none;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .slice-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(-30deg);
+            text-align: center;
+            padding: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .wheel-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .slice {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 กงล้อเลือกสถานที่ท่องเที่ยว</h1>
+        
+        <div class="wheel-container">
+            <div class="pointer"></div>
+            <div class="wheel" id="wheel">
+                <div class="slice">
+                    <div class="slice-text">🏖️ ภูเก็ต</div>
+                </div>
+                <div class="slice">
+                    <div class="slice-text">🏝️ เกาะสมุย</div>
+                </div>
+                <div class="slice">
+                    <div class="slice-text">🏛️ เชียงใหม่</div>
+                </div>
+                <div class="slice">
+                    <div class="slice-text">🌊 พัทยา</div>
+                </div>
+                <div class="slice">
+                    <div class="slice-text">🏞️ เขาใหญ่</div>
+                </div>
+                <div class="slice">
+                    <div class="slice-text">🛕 อยุธยา</div>
+                </div>
+            </div>
+            <div class="center-circle"></div>
+        </div>
+
+        <div class="controls">
+            <button class="spin-btn" id="spinBtn" onclick="spinWheel()">🎲 หมุนกงล้อ!</button>
+        </div>
+
+        <div class="result" id="result">
+            <h2>🎯 กดปุ่มหมุนเพื่อเลือกสถานที่ท่องเที่ยว!</h2>
+            <p>ปล่อยให้โชคชะตาเป็นตัวตัดสินให้คุณ</p>
+        </div>
+
+        <div class="history">
+            <h3>📋 ประวัติการหมุน</h3>
+            <div id="historyList">
+                <p style="text-align: center; color: #bdc3c7;">ยังไม่มีประวัติการหมุน</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const places = [
+            {
+                name: "ภูเก็ต",
+                emoji: "🏖️",
+                description: "เกาะแห่งความสวยงามในทะเลอันดามัน มีหาดทรายขาวสะอาด น้ำทะเลใสเขียวมรกต และวิวพระอาทิตย์ตกที่สวยงาม"
+            },
+            {
+                name: "เกาะสมุย",
+                emoji: "🏝️",
+                description: "เกาะในอ่าวไทยที่มีหาดทรายขาวนวลและต้นมะพร้าวเขียวชอุ่ม บรยากาศเงียบสงบเหมาะสำหรับการพักผ่อน"
+            },
+            {
+                name: "เชียงใหม่",
+                emoji: "🏛️",
+                description: "เมืองวัฟฒนธรรมล้านนา มีวัดเก่าแก่สวยงาม ตลาดกิน-เที่ยวคึกคัก และธรรมชาติภูเขาที่สวยงาม"
+            },
+            {
+                name: "พัทยา",
+                emoji: "🌊",
+                description: "เมืองแห่งความสนุกสนานริมทะเล มีกิจกรรมทางน้ำหลากหลาย ไนต์ไลฟ์ที่มีชีวิตชีวา และอาหารทะเลสดใหม่"
+            },
+            {
+                name: "เขาใหญ่",
+                emoji: "🏞️",
+                description: "อุทยานแห่งชาติที่มีป่าเขียวชอุ่ม อากาศเย็นสบาย น้ำตกสวยงาม และสัตว์ป่าหลากหลายชนิด"
+            },
+            {
+                name: "อยุธยา",
+                emoji: "🛕",
+                description: "เมืองโบราณเก่าแก่มรดกโลก มีซากปรักหักพังวัดโบราณที่งดงาม เล่าเรื่องราวประวัติศาสตร์อันยาวนาน"
+            }
+        ];
+
+        let isSpinning = false;
+        let history = [];
+
+        function spinWheel() {
+            if (isSpinning) return;
+            
+            isSpinning = true;
+            const spinBtn = document.getElementById('spinBtn');
+            const wheel = document.getElementById('wheel');
+            
+            spinBtn.disabled = true;
+            spinBtn.textContent = '🌀 กำลังหมุน...';
+
+            // สุ่มองศาการหมุน (5-10 รอบ + องศาสุ่ม)
+            const spins = Math.floor(Math.random() * 6) + 5; // 5-10 รอบ
+            const randomDegree = Math.floor(Math.random() * 360);
+            const totalDegree = (spins * 360) + randomDegree;
+
+            wheel.style.transform = `rotate(${totalDegree}deg)`;
+
+            // เล่นเสียง (จำลอง)
+            playSpinSound();
+
+            setTimeout(() => {
+                // คำนวณผลลัพธ์
+                const normalizedDegree = (360 - (totalDegree % 360)) % 360;
+                const sliceAngle = 360 / 6;
+                const selectedIndex = Math.floor(normalizedDegree / sliceAngle);
+                const selectedPlace = places[selectedIndex];
+
+                showResult(selectedPlace);
+                addToHistory(selectedPlace);
+                createConfetti();
+
+                isSpinning = false;
+                spinBtn.disabled = false;
+                spinBtn.textContent = '🎲 หมุนอีกครั้ง!';
+            }, 4000);
+        }
+
+        function showResult(place) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h2>🎉 ผลลัพธ์: ${place.emoji} ${place.name}</h2>
+                <p>${place.description}</p>
+            `;
+            
+            // เอฟเฟกต์เสียงเมื่อได้ผลลัพธ์
+            playResultSound();
+        }
+
+        function addToHistory(place) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('th-TH', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            history.unshift({
+                place: place,
+                time: timeString
+            });
+
+            // เก็บแค่ 5 รายการล่าสุด
+            if (history.length > 5) {
+                history = history.slice(0, 5);
+            }
+
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="text-align: center; color: #bdc3c7;">ยังไม่มีประวัติการหมุน</p>';
+                return;
+            }
+
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <strong>${item.place.emoji} ${item.place.name}</strong> - ${item.time}
+                </div>
+            `).join('');
+        }
+
+        function createConfetti() {
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA726', '#AB47BC', '#66BB6A'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 50);
+            }
+        }
+
+        function playSpinSound() {
+            // สร้างเสียงผ่าน Web Audio API (จำลอง)
+            if (typeof(AudioContext) !== "undefined" || typeof(webkitAudioContext) !== "undefined") {
+                const audioContext = new (AudioContext || webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            }
+        }
+
+        function playResultSound() {
+            // เสียงเมื่อได้ผลลัพธ์
+            if (typeof(AudioContext) !== "undefined" || typeof(webkitAudioContext) !== "undefined") {
+                const audioContext = new (AudioContext || webkitAudioContext)();
+                
+                // เล่นโน้ตดนตรีสั้นๆ
+                const notes = [262, 330, 392]; // C, E, G
+                notes.forEach((freq, index) => {
+                    setTimeout(() => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                        
+                        oscillator.start(audioContext.currentTime);
+                        oscillator.stop(audioContext.currentTime + 0.3);
+                    }, index * 100);
+                });
+            }
+        }
+
+        // เพิ่มเอฟเฟกต์ hover สำหรับกงล้อ
+        document.getElementById('wheel').addEventListener('mouseenter', function() {
+            if (!isSpinning) {
+                this.style.transform += ' scale(1.05)';
+            }
+        });
+
+        document.getElementById('wheel').addEventListener('mouseleave', function() {
+            if (!isSpinning) {
+                this.style.transform = this.style.transform.replace(' scale(1.05)', '');
+            }
+        });
+    </script>
+</body>
+</html>
