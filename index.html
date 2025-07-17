@@ -1009,6 +1009,10 @@
                             <label for="positionSize">POSITION ที่ซื้อได้ (USDT):</label>
                             <input type="number" id="positionSize" placeholder="คำนวณอัตโนมัติ" readonly>
                         </div>
+
+                        <div class="btn-group" style="margin-top: 20px;">
+                            <button class="btn btn-reset" onclick="resetPositionCalculator()" type="button">🔄 Reset Position</button>
+                        </div>
                     </div>
 
                     <div class="position-results" id="positionResults" style="display: none;">
@@ -1275,7 +1279,7 @@
                     document.getElementById('weight4').value = '20';
                     document.getElementById('weight5').value = '20';
                     break;
-                case 2: // Aggressive Growth (Default)
+                case 2: // Aggressive Growth
                     document.getElementById('weight1').value = '10';
                     document.getElementById('weight2').value = '15';
                     document.getElementById('weight3').value = '20';
@@ -1582,6 +1586,37 @@
                 `${tp5Split.toFixed(0)} USDT (${tp5.toFixed(2)}%) → กำไร ${tp5Profit.toFixed(0)} USDT` : 'ไม่ใช้';
             
             document.getElementById('tpResults').style.display = 'block';
+        }
+
+        function resetPositionCalculator() {
+            // Reset position calculator inputs
+            const riskInput = document.getElementById('riskAmount');
+            const stopLossInput = document.getElementById('stopLossPercent');
+            const positionInput = document.getElementById('positionSize');
+            
+            if (riskInput) riskInput.value = '';
+            if (stopLossInput) stopLossInput.value = '';
+            if (positionInput) positionInput.value = '';
+            
+            // Reset Take Profit inputs
+            const tpInputs = ['tp1', 'tp2', 'tp3', 'tp4', 'tp5'];
+            tpInputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) input.value = '';
+            });
+            
+            // Reset weight to current active strategy
+            const activeStrategy = document.querySelector('.strategy-btn.active');
+            if (activeStrategy) {
+                const strategyNumber = parseInt(activeStrategy.dataset.strategy);
+                applyStrategy(strategyNumber);
+            }
+            
+            // Hide result sections
+            const positionResults = document.getElementById('positionResults');
+            const tpResults = document.getElementById('tpResults');
+            if (positionResults) positionResults.style.display = 'none';
+            if (tpResults) tpResults.style.display = 'none';
         }
 
         function resetCalculator() {
