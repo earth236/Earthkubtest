@@ -1045,17 +1045,17 @@
                 
                 <div class="auto-note">
                     <strong>📋 Default Values:</strong> TP จะตั้งค่า default ตาม Stop Loss % (SL×1, SL×1.5, SL×2, SL×2.5, SL×3) แต่ยังปรับแต่งได้<br>
-                    <strong>📊 Weight:</strong> TP เริ่มต้นใช้ STRATEGY 2 (10%, 15%, 20%, 25%, 30%) แต่ยังปรับแต่งได้ตามต้องการ
+                    <strong>📊 Weight:</strong> TP เริ่มต้นใช้ STRATEGY 1 (20%, 20%, 20%, 20%, 20%) แต่ยังปรับแต่งได้ตามต้องการ
                 </div>
 
                 <div class="strategy-selection" style="margin-bottom: 20px;">
                     <h3 style="color: #0369a1; margin-bottom: 15px; font-weight: bold;">📈 เลือก TP Strategy:</h3>
                     <div class="strategy-buttons">
-                        <button class="strategy-btn" data-strategy="1" onclick="applyStrategy(1)">
+                        <button class="strategy-btn active" data-strategy="1" onclick="applyStrategy(1)">
                             🥇 STRATEGY 1<br>
                             <small>Conservative Growth (RR: 2.00)</small>
                         </button>
-                        <button class="strategy-btn active" data-strategy="2" onclick="applyStrategy(2)">
+                        <button class="strategy-btn" data-strategy="2" onclick="applyStrategy(2)">
                             🥈 STRATEGY 2<br>
                             <small>Aggressive Growth (RR: 2.25)</small>
                         </button>
@@ -1071,13 +1071,13 @@
                         <label>TP1 (%) - R:R 1:1:</label>
                         <input type="number" id="tp1" placeholder="SL × 1.0" step="0.1" oninput="calculateTakeProfit()">
                         <label>Weight (%):</label>
-                        <input type="number" id="weight1" placeholder="10" step="1" oninput="calculateTakeProfit()">
+                        <input type="number" id="weight1" placeholder="20" step="1" oninput="calculateTakeProfit()">
                     </div>
                     <div class="tp-item">
                         <label>TP2 (%) - R:R 1:1.5:</label>
                         <input type="number" id="tp2" placeholder="SL × 1.5" step="0.1" oninput="calculateTakeProfit()">
                         <label>Weight (%):</label>
-                        <input type="number" id="weight2" placeholder="15" step="1" oninput="calculateTakeProfit()">
+                        <input type="number" id="weight2" placeholder="20" step="1" oninput="calculateTakeProfit()">
                     </div>
                     <div class="tp-item">
                         <label>TP3 (%) - R:R 1:2:</label>
@@ -1089,13 +1089,13 @@
                         <label>TP4 (%) - R:R 1:2.5:</label>
                         <input type="number" id="tp4" placeholder="SL × 2.5" step="0.1" oninput="calculateTakeProfit()">
                         <label>Weight (%):</label>
-                        <input type="number" id="weight4" placeholder="25" step="1" oninput="calculateTakeProfit()">
+                        <input type="number" id="weight4" placeholder="20" step="1" oninput="calculateTakeProfit()">
                     </div>
                     <div class="tp-item">
                         <label>TP5 (%) - R:R 1:3:</label>
                         <input type="number" id="tp5" placeholder="SL × 3.0" step="0.1" oninput="calculateTakeProfit()">
                         <label>Weight (%):</label>
-                        <input type="number" id="weight5" placeholder="30" step="1" oninput="calculateTakeProfit()">
+                        <input type="number" id="weight5" placeholder="20" step="1" oninput="calculateTakeProfit()">
                     </div>
                 </div>
 
@@ -1182,9 +1182,9 @@
                     </div>
                     <div class="tip-card">
                         <h4>🎯 TP Strategy Options</h4>
-                        <p><strong>🥇 STRATEGY 1 - Conservative Growth (RR: 2.00):</strong><br>
+                        <p><strong>🥇 STRATEGY 1 - Conservative Growth (RR: 2.00) [Default]:</strong><br>
                         TP1: 20% | TP2: 20% | TP3: 20% | TP4: 20% | TP5: 20%<br><br>
-                        <strong>🥈 STRATEGY 2 - Aggressive Growth (RR: 2.25) [Default]:</strong><br>
+                        <strong>🥈 STRATEGY 2 - Aggressive Growth (RR: 2.25):</strong><br>
                         TP1: 10% | TP2: 15% | TP3: 20% | TP4: 25% | TP5: 30%<br><br>
                         <strong>🥉 STRATEGY 3 - Let Profit Run (RR: 2.35):</strong><br>
                         TP1: 10% | TP2: 10% | TP3: 20% | TP4: 30% | TP5: 30%</p>
@@ -1243,21 +1243,21 @@
         }
 
         function setDefaultValues() {
-            // Set default weight values using STRATEGY 2 (Aggressive Growth) if fields are empty
+            // Set default weight values using STRATEGY 1 (Conservative Growth) if fields are empty
             if (!document.getElementById('weight1').value) {
-                document.getElementById('weight1').value = '10';
+                document.getElementById('weight1').value = '20';
             }
             if (!document.getElementById('weight2').value) {
-                document.getElementById('weight2').value = '15';
+                document.getElementById('weight2').value = '20';
             }
             if (!document.getElementById('weight3').value) {
                 document.getElementById('weight3').value = '20';
             }
             if (!document.getElementById('weight4').value) {
-                document.getElementById('weight4').value = '25';
+                document.getElementById('weight4').value = '20';
             }
             if (!document.getElementById('weight5').value) {
-                document.getElementById('weight5').value = '30';
+                document.getElementById('weight5').value = '20';
             }
         }
 
@@ -1614,9 +1614,9 @@
                 if (element) element.style.display = 'none';
             });
 
-            // Reset to STRATEGY 2 (default)
+            // Reset to STRATEGY 1 (default)
             document.querySelectorAll('.strategy-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector('[data-strategy="2"]').classList.add('active');
+            document.querySelector('[data-strategy="1"]').classList.add('active');
             
             updateScore();
             updateCutLossStatus();
