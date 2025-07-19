@@ -514,18 +514,6 @@
             font-weight: bold;
         }
 
-        .auto-note {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            color: #92400e;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 1rem;
-            border-left: 5px solid #d97706;
-            font-weight: 500;
-            border: 1px solid #fcd34d;
-        }
-
         .strategy-buttons {
             display: flex;
             gap: 15px;
@@ -572,51 +560,6 @@
             font-weight: normal;
         }
 
-        .crypto-tips {
-            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-            border-radius: 15px;
-            padding: 30px;
-            margin-top: 30px;
-            border: 2px solid #0ea5e9;
-        }
-
-        .tips-title {
-            color: #0369a1;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
-        }
-
-        .tips-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-        }
-
-        .tip-card {
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            padding: 20px;
-            border-radius: 12px;
-            border-left: 5px solid #0ea5e9;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-        }
-
-        .tip-card h4 {
-            color: #0369a1;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-        }
-
-        .tip-card p {
-            color: #374151;
-            font-size: 1rem;
-            line-height: 1.5;
-        }
-
         .mode-long .category {
             border-left-color: #10b981;
         }
@@ -627,6 +570,69 @@
 
         .hidden {
             display: none;
+        }
+
+        /* Compact Filter Styles */
+        .filters-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filter-section {
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid;
+        }
+
+        .price-running-filter .filter-section {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border-color: #d97706;
+        }
+
+        .ema-filter .filter-section {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-color: #059669;
+        }
+
+        .filter-section h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .filter-section .checkbox-item {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            margin-bottom: 8px;
+        }
+
+        .filter-section .checkbox-item label {
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .filter-section .checkbox-points {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .filter-note {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            line-height: 1.3;
+        }
+
+        .filter-note div {
+            margin-bottom: 3px;
         }
 
         @media (max-width: 768px) {
@@ -655,10 +661,6 @@
                 grid-template-columns: 1fr;
             }
 
-            .tips-grid {
-                grid-template-columns: 1fr;
-            }
-
             .strategy-buttons {
                 flex-direction: column;
             }
@@ -666,6 +668,10 @@
             .strategy-btn {
                 min-width: auto;
                 width: 100%;
+            }
+
+            .filters-container {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -940,33 +946,60 @@
             <div class="scoring-section calculator">
                 <h2 class="section-title">🛑 Cut Loss Conditions Monitor</h2>
                 
-                <div class="auto-note">
-                    <strong>🎯 EMA 5 Filter:</strong> ถ้ายังไม่หลุด EMA 5 (4H) จะลดน้ำหนักเงื่อนไขใด<br>
-                    <strong>⚠️ Cut Loss Alert:</strong> Score ≥60% = พิจารณา Cut Loss | Score ≥80% = ต้อง Cut Loss ทันที<br>
-                    <strong>🛡️ EMA 5 Filter:</strong> ยังไม่หลุด = ท่าน Cut (ยกเว้นเพลุกลุ่ม) | หลุดแล้ว = ใช้เกสตริไปก์
+                <!-- Compact Filters Side by Side -->
+                <div class="filters-container">
+                    <!-- Price Running Filter -->
+                    <div class="price-running-filter">
+                        <div class="filter-section">
+                            <h3>🚀 Price Running >2RR</h3>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="price_running_filter" data-filter="true">
+                                <label for="price_running_filter">ราคาวิ่ง >2RR แล้ว</label>
+                                <div class="checkbox-points">Filter</div>
+                            </div>
+                            
+                            <div class="filter-note">
+                                <div><strong>ปกติ:</strong> PA=70% | TE=30%</div>
+                                <div><strong>ราคาวิ่ง:</strong> PA=20% | TE=80%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EMA 5 Filter -->
+                    <div class="ema-filter">
+                        <div class="filter-section">
+                            <h3>🎯 EMA 5 (4H) Filter</h3>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="ema5_filter" data-filter="true">
+                                <label for="ema5_filter">หลุด EMA 5 (4H) แล้ว</label>
+                                <div class="checkbox-points">Filter</div>
+                            </div>
+                            
+                            <div class="filter-note">
+                                <div><strong>ยังไม่หลุด:</strong> ลดน้ำหนัก 50%</div>
+                                <div><strong>หลุดแล้ว:</strong> ใช้น้ำหนักเต็ม</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- EMA 5 Filter -->
-                <div class="ema-filter" style="margin-bottom: 20px;">
-                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 20px; border-radius: 12px; border: 2px solid #059669;">
-                        <h3 style="margin-bottom: 15px; font-weight: bold;">🎯 EMA 5 (4H) Filter</h3>
-                        <div class="checkbox-item" style="border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1);">
-                            <input type="checkbox" id="ema5_filter" data-filter="true">
-                            <label for="ema5_filter" style="color: white;">📉 หลุด EMA 5 (4H) แล้ว - ปลดล็อกน้ำหนัก Cut Loss</label>
-                            <div class="checkbox-points" style="background: rgba(255,255,255,0.2); color: white;">Filter</div>
-                        </div>
-                        
-                        <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px; font-size: 0.95rem;">
-                            <div style="margin-bottom: 8px;">🔍 <strong>พิกัด:</strong> EMA 5 (4H) = ข้อมูล 20 ชั่วโมง ใหม่แล้ว</div>
-                            <div style="margin-bottom: 8px;">🔥 <strong>ยังไม่หลุด:</strong> ลดน้ำหนักเงื่อนไข 50% + เกตคิท Cut ลงชั้น</div>
-                            <div>🚀 <strong>หลุดแล้ว:</strong> ใช้น้ำหนักเต็ม + เกตคิท Cut ปกติ</div>
-                        </div>
+                <!-- Important Notes -->
+                <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 10px; padding: 12px; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.4;">
+                    <div style="color: #92400e; font-weight: bold; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <span>⚠️</span>
+                        <span>สำคัญ</span>
+                    </div>
+                    <div style="color: #78350f; margin-bottom: 6px;">
+                        <strong>📈 ราคาวิ่ง >2RR:</strong> หากราคาหลุด EMA 5 + RSI &lt;EMA ขายทำกำไรได้เลย
+                    </div>
+                    <div style="color: #78350f;">
+                        <strong>🛡️ ออเดอร์ใหม่:</strong> หากเริ่มเปิดออเดอร์แล้วราคายังไม่ไป ให้รอจนกว่า MACD ตัดกับเส้น 0 ค่อย CUT
                     </div>
                 </div>
 
                 <div class="two-column">
                     <div>
-                        <h3 style="color: #ef4444; margin-bottom: 15px; font-weight: bold;">📈 Price Action (70%)</h3>
+                        <h3 style="color: #ef4444; margin-bottom: 15px; font-weight: bold;">📈 Price Action (<span id="priceActionWeight">70%</span>)</h3>
                         <div class="checkbox-group">
                             <div class="checkbox-item" style="border-color: #ef4444;">
                                 <input type="checkbox" id="cutloss_horizontal" data-severity="critical" data-weight="40">
@@ -982,7 +1015,7 @@
                     </div>
 
                     <div>
-                        <h3 style="color: #f97316; margin-bottom: 15px; font-weight: bold;">📊 Technical Indicators (30%)</h3>
+                        <h3 style="color: #f97316; margin-bottom: 15px; font-weight: bold;">📊 Technical Indicators (<span id="technicalWeight">30%</span>)</h3>
                         <div class="checkbox-group">
                             <div class="checkbox-item" style="border-color: #f97316;">
                                 <input type="checkbox" id="cutloss_rsi" data-severity="medium" data-weight="15">
@@ -990,9 +1023,14 @@
                                 <div class="checkbox-points" style="background: linear-gradient(45deg, #f97316, #ea580c);">15%</div>
                             </div>
                             <div class="checkbox-item" style="border-color: #f97316;">
-                                <input type="checkbox" id="cutloss_macd" data-severity="medium" data-weight="15">
-                                <label for="cutloss_macd">MACD หดตัว/ลดลง - Medium</label>
-                                <div class="checkbox-points" style="background: linear-gradient(45deg, #f97316, #ea580c);">15%</div>
+                                <input type="checkbox" id="cutloss_macd_momentum" data-severity="medium" data-weight="7.5">
+                                <label for="cutloss_macd_momentum">MACD เพิ่มขึ้น//ลดลง - Medium</label>
+                                <div class="checkbox-points" style="background: linear-gradient(45deg, #f97316, #ea580c);">7.5%</div>
+                            </div>
+                            <div class="checkbox-item" style="border-color: #f97316;">
+                                <input type="checkbox" id="cutloss_macd_zero" data-severity="medium" data-weight="7.5">
+                                <label for="cutloss_macd_zero">MACD ตัด 0 - Medium</label>
+                                <div class="checkbox-points" style="background: linear-gradient(45deg, #f97316, #ea580c);">7.5%</div>
                             </div>
                         </div>
                     </div>
@@ -1075,11 +1113,6 @@
             <div class="scoring-section calculator">
                 <h2 class="section-title">🎯 Take Profit Calculator</h2>
                 
-                <div class="auto-note">
-                    <strong>📋 Default Values:</strong> TP จะตั้งค่า default ตาม Stop Loss % (SL×1, SL×1.5, SL×2, SL×2.5, SL×3) แต่ยังปรับแต่งได้<br>
-                    <strong>📊 Weight:</strong> TP เริ่มต้นใช้ STRATEGY 1 (20%, 20%, 20%, 20%, 20%) แต่ยังปรับแต่งได้ตามต้องการ
-                </div>
-
                 <div class="strategy-selection" style="margin-bottom: 20px;">
                     <h3 style="color: #0369a1; margin-bottom: 15px; font-weight: bold;">📈 เลือก TP Strategy:</h3>
                     <div class="strategy-buttons">
@@ -1164,77 +1197,6 @@
                             <span>TP5:</span>
                             <span id="tp5Split">$0 (0%)</span>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Crypto Tips -->
-            <div class="crypto-tips">
-                <h3 class="tips-title">🚀 Crypto Trading Tips</h3>
-                <div class="tips-grid">
-                    <div class="tip-card">
-                        <h4>⏰ Best Trading Hours</h4>
-                        <p><strong>08:00-12:00 UTC:</strong> Europe active<br>
-                        <strong>13:00-17:00 UTC:</strong> US market overlap<br>
-                        <strong>21:00-01:00 UTC:</strong> Asia active</p>
-                    </div>
-                    <div class="tip-card">
-                        <h4>📊 Volume Analysis</h4>
-                        <p>คริปโตใช้ Volume Spike >200% แทน 150%<br>
-                        ระวัง Weekend Volume ที่มักต่ำกว่า Weekday<br>
-                        เช็ค Volume ทุก 4H timeframe</p>
-                    </div>
-                    <div class="tip-card">
-                        <h4>🎪 Key S/R Levels</h4>
-                        <p>Psychological levels ($50K, $60K, $70K)<br>
-                        Previous ATH/ATL levels<br>
-                        Major exchange liquidation zones</p>
-                    </div>
-                    <div class="tip-card">
-                        <h4>🛡️ Risk Management</h4>
-                        <p>Risk 1-3% per trade (higher volatility)<br>
-                        Stop Loss: EMA 5 (4H) or EMA 20 Daily<br>
-                        Take Profit: เร็วกว่าหุ้น (2-5 วัน)</p>
-                    </div>
-                    <div class="tip-card">
-                        <h4>📈 Signal Strength</h4>
-                        <p><strong>8-10:</strong> Strong Signal 🔥<br>
-                        <strong>6-7:</strong> Moderate Signal ⚡<br>
-                        <strong>&lt;6:</strong> Weak Signal ⚠️<br><br>
-                        <strong>📊 Weight Distribution:</strong><br>
-                        • TREND CONFIRMATION: 30% (3 คะแนน)<br>
-                        • MOMENTUM: 30% (3 คะแนน)<br>
-                        • ENTRY TIMING: 40% (4 คะแนน)</p>
-                    </div>
-                    <div class="tip-card">
-                        <h4>🎯 TP Strategy Options</h4>
-                        <p><strong>🥇 STRATEGY 1 - Conservative Growth (RR: 2.00) [Default]:</strong><br>
-                        TP1: 20% | TP2: 20% | TP3: 20% | TP4: 20% | TP5: 20%<br><br>
-                        <strong>🥈 STRATEGY 2 - Aggressive Growth (RR: 2.25):</strong><br>
-                        TP1: 10% | TP2: 15% | TP3: 20% | TP4: 25% | TP5: 30%<br><br>
-                        <strong>🥉 STRATEGY 3 - Let Profit Run (RR: 2.35):</strong><br>
-                        TP1: 10% | TP2: 10% | TP3: 20% | TP4: 30% | TP5: 30%</p>
-                    </div>
-                    <div class="tip-card">
-                        <h4>🛑 Cut Loss Weight System</h4>
-                        <p><strong>🎯 EMA 5 (4H) Filter:</strong><br>
-                        • ยังไม่หลุด EMA 5 = ลดน้ำหนัก 50%<br>
-                        • หลุด EMA 5 แล้ว = ใช้น้ำหนักเต็ม<br><br>
-                        <strong>Price Action (70%):</strong><br>
-                        • หลุดแนวรับ S/R - 40%<br>
-                        • หลุดเทรนไลน์ - 30%<br>
-                        <strong>Technical Indicators (30%):</strong><br>
-                        • RSI < EMA RSI 14 - 15%<br>
-                        • MACD หดตัว/ลดลง - 15%<br>
-                        <strong>Score ≥60%:</strong> พิจารณา Cut Loss<br>
-                        <strong>Score ≥80%:</strong> ต้อง Cut Loss ทันที!</p>
-                    </div>
-                    <div class="tip-card">
-                        <h4>⚠️ Important Notes</h4>
-                        <p>24/7 market - no gaps but watch thin liquidity<br>
-                        News impact faster than traditional markets<br>
-                        Always combine with S/R analysis<br>
-                        <strong>Cut Loss:</strong> วินัยสำคัญกว่ากำไร</p>
                     </div>
                 </div>
             </div>
@@ -1364,16 +1326,35 @@
 
         function updateCutLossStatus() {
             const ema5Filter = document.getElementById('ema5_filter').checked;
+            const priceRunningFilter = document.getElementById('price_running_filter').checked;
             const cutlossCheckboxes = document.querySelectorAll('input[id^="cutloss_"]:checked');
             let totalScore = 0;
             let activeConditions = [];
             
             // Calculate weight multiplier based on EMA 5 filter
-            const weightMultiplier = ema5Filter ? 1.0 : 0.5; // If EMA 5 not broken, reduce weight by 50%
+            const emaMultiplier = ema5Filter ? 1.0 : 0.5; // If EMA 5 not broken, reduce weight by 50%
+            
+            // Update weight distribution display based on Price Running filter
+            let priceActionBaseWeight = priceRunningFilter ? 20 : 70;
+            let technicalBaseWeight = priceRunningFilter ? 80 : 30;
+            
+            document.getElementById('priceActionWeight').textContent = `${priceActionBaseWeight}%`;
+            document.getElementById('technicalWeight').textContent = `${technicalBaseWeight}%`;
             
             cutlossCheckboxes.forEach(checkbox => {
-                const baseWeight = parseFloat(checkbox.dataset.weight);
-                const actualWeight = baseWeight * weightMultiplier;
+                let baseWeight = parseFloat(checkbox.dataset.weight);
+                
+                // Apply Price Running filter weight adjustment
+                if (checkbox.id === 'cutloss_horizontal' || checkbox.id === 'cutloss_trendline') {
+                    // Price Action conditions
+                    baseWeight = baseWeight * (priceActionBaseWeight / 70); // Scale based on new weight
+                } else {
+                    // Technical conditions
+                    baseWeight = baseWeight * (technicalBaseWeight / 30); // Scale based on new weight
+                }
+                
+                // Apply EMA 5 filter
+                const actualWeight = baseWeight * emaMultiplier;
                 const severity = checkbox.dataset.severity;
                 const label = checkbox.nextElementSibling.textContent;
                 
@@ -1382,12 +1363,22 @@
                     label: label,
                     severity: severity,
                     weight: actualWeight,
-                    baseWeight: baseWeight
+                    baseWeight: parseFloat(checkbox.dataset.weight),
+                    adjustedBaseWeight: baseWeight
                 });
             });
             
-            // Add EMA 5 filter status to conditions if relevant
+            // Add filter status to conditions if relevant
             if (cutlossCheckboxes.length > 0) {
+                if (priceRunningFilter) {
+                    activeConditions.unshift({
+                        label: 'ราคาวิ่ง >2RR แล้ว - Technical หนัก (80%)',
+                        severity: 'info',
+                        weight: 0,
+                        baseWeight: 0,
+                        isFilter: true
+                    });
+                }
                 activeConditions.unshift({
                     label: ema5Filter ? 'EMA 5 (4H) หลุดแล้ว - ใช้น้ำหนักเต็ม' : 'EMA 5 (4H) ยังไม่หลุด - ลดน้ำหนัก 50%',
                     severity: ema5Filter ? 'info' : 'warning',
@@ -1397,7 +1388,7 @@
                 });
             }
             
-            // Determine alert level based on score (updated thresholds)
+            // Determine alert level based on score
             let alertLevel = '';
             let alertLevelColor = '';
             let recommendation = '';
@@ -1421,15 +1412,25 @@
             } else {
                 alertLevel = 'SAFE ✅';
                 alertLevelColor = '#10b981';
-                recommendation = ema5Filter ? 
-                    '✅ ปลอดภัย EMA 5 (4H) หลุดแล้ว ไม่มีเงื่อนไขการ Cut Loss เกิดขึ้น' :
-                    '✅ ปลอดภัย EMA 5 (4H) ยังไม่หลุด ไม่มีเงื่อนไขการ Cut Loss เกิดขึ้น';
+                let filterStatus = '';
+                if (priceRunningFilter && ema5Filter) {
+                    filterStatus = 'ราคาวิ่ง >2RR + EMA 5 หลุด';
+                } else if (priceRunningFilter) {
+                    filterStatus = 'ราคาวิ่ง >2RR';
+                } else if (ema5Filter) {
+                    filterStatus = 'EMA 5 หลุด';
+                } else {
+                    filterStatus = 'EMA 5 ยังไม่หลุด';
+                }
+                recommendation = `✅ ปลอดภัย (${filterStatus}) ไม่มีเงื่อนไขการ Cut Loss เกิดขึ้น`;
             }
             
             // Update display
             document.getElementById('alertLevel').textContent = alertLevel;
             document.getElementById('alertLevel').style.color = alertLevelColor;
-            document.getElementById('cutlossScore').textContent = `Cut Loss Score: ${totalScore.toFixed(0)}% (ลดน้ำหนัก ${ema5Filter ? '100%' : '50%'})`;
+            
+            const filterInfo = `EMA Filter: ${ema5Filter ? '100%' : '50%'} | Weight: PA:${priceActionBaseWeight}% TE:${technicalBaseWeight}%`;
+            document.getElementById('cutlossScore').textContent = `Cut Loss Score: ${totalScore.toFixed(0)}% (${filterInfo})`;
             document.getElementById('alertRecommendation').textContent = recommendation;
             
             // Update active conditions list
@@ -1451,10 +1452,12 @@
                             case 'low': color = '#f59e0b'; icon = '💡'; break;
                         }
                     }
-                    const weightDisplay = condition.isFilter ? 'Filter' : 
-                        (condition.weight !== condition.baseWeight ? 
-                            `${condition.weight.toFixed(0)}% (${condition.baseWeight}%)` : 
-                            `${condition.weight.toFixed(0)}%`);
+                    
+                    let weightDisplay = condition.isFilter ? 'Filter' : 
+                        `${condition.weight.toFixed(1)}%`;
+                    if (!condition.isFilter && condition.adjustedBaseWeight !== condition.baseWeight) {
+                        weightDisplay += ` (${condition.baseWeight}%→${condition.adjustedBaseWeight.toFixed(1)}%→${condition.weight.toFixed(1)}%)`;
+                    }
                     
                     return `<div style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: ${color}15; border-left: 4px solid ${color}; border-radius: 6px;">
                         <div style="display: flex; align-items: center;">
@@ -1467,7 +1470,7 @@
             }
             
             // Show/hide results
-            if (totalScore > 0 || ema5Filter !== null) {
+            if (totalScore > 0 || activeConditions.length > 0) {
                 document.getElementById('cutlossResults').style.display = 'block';
             } else {
                 document.getElementById('cutlossResults').style.display = 'none';
@@ -1647,8 +1650,8 @@
                 checkbox.checked = false;
             });
             
-            // Reset Cut Loss checkboxes including EMA 5 filter
-            document.querySelectorAll('input[type="checkbox"][id^="cutloss_"], input[type="checkbox"][id="ema5_filter"]').forEach(checkbox => {
+            // Reset Cut Loss checkboxes including filters
+            document.querySelectorAll('input[type="checkbox"][id^="cutloss_"], input[type="checkbox"][id="ema5_filter"], input[type="checkbox"][id="price_running_filter"]').forEach(checkbox => {
                 checkbox.checked = false;
             });
             
@@ -1692,7 +1695,7 @@
 
         // Add event listeners to all checkboxes
         document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-            if (checkbox.id.startsWith('cutloss_') || checkbox.id === 'ema5_filter') {
+            if (checkbox.id.startsWith('cutloss_') || checkbox.id === 'ema5_filter' || checkbox.id === 'price_running_filter') {
                 checkbox.addEventListener('change', updateCutLossStatus);
             } else {
                 checkbox.addEventListener('change', updateScore);
