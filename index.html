@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Trading Signal Scoring System</title>
+    <title>Crypto Trading Signal Scoring System - Updated</title>
     <style>
         * {
             margin: 0;
@@ -674,7 +674,7 @@
     <div class="container">
         <div class="header">
             <h1>🚀 Crypto Trading Signal Scoring</h1>
-            <p>ระบบให้คะแนนสัญญาณการเทรดคริปโตแกะมืออาชีพ</p>
+            <p>ระบบให้คะแนนสัญญาณการเทรดคริปโตแกะมืออาชีพ - Updated</p>
             
             <div class="trading-mode">
                 <div class="mode-btn active" onclick="setMode('long')">📈 LONG SIGNALS</div>
@@ -708,29 +708,33 @@
                         <div class="category">
                             <div class="category-header">
                                 <div class="category-title">📈 MOMENTUM</div>
-                                <div class="category-weight">40%</div>
+                                <div class="category-weight">30%</div>
                             </div>
                             <div class="signal-item">
                                 <div class="signal-name">MACD 4H Signal Cross UP</div>
-                                <div class="signal-points">2</div>
+                                <div class="signal-points">1.5</div>
                             </div>
                             <div class="signal-item">
                                 <div class="signal-name">RSI > EMA RSI 14 (4H)</div>
-                                <div class="signal-points">2</div>
+                                <div class="signal-points">1.5</div>
                             </div>
                         </div>
 
                         <div class="category">
                             <div class="category-header">
                                 <div class="category-title">📍 ENTRY TIMING</div>
-                                <div class="category-weight">30%</div>
+                                <div class="category-weight">40%</div>
                             </div>
                             <div class="signal-item">
                                 <div class="signal-name">Volume > 20-period Avg</div>
                                 <div class="signal-points">1</div>
                             </div>
                             <div class="signal-item">
-                                <div class="signal-name">No Bearish Divergence</div>
+                                <div class="signal-name">ทำโซนสะสม (หลุด/ยืน EMA20 4H)</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">สำหรับสวนเทรนด์ ! เกิด Bullish Divergence</div>
                                 <div class="signal-points">1</div>
                             </div>
                             <div class="signal-item">
@@ -760,29 +764,33 @@
                         <div class="category">
                             <div class="category-header">
                                 <div class="category-title">📈 MOMENTUM</div>
-                                <div class="category-weight">40%</div>
+                                <div class="category-weight">30%</div>
                             </div>
                             <div class="signal-item">
                                 <div class="signal-name">MACD 4H Signal Cross DOWN</div>
-                                <div class="signal-points">2</div>
+                                <div class="signal-points">1.5</div>
                             </div>
                             <div class="signal-item">
                                 <div class="signal-name">RSI < EMA RSI 14 (4H)</div>
-                                <div class="signal-points">2</div>
+                                <div class="signal-points">1.5</div>
                             </div>
                         </div>
 
                         <div class="category">
                             <div class="category-header">
                                 <div class="category-title">📍 ENTRY TIMING</div>
-                                <div class="category-weight">30%</div>
+                                <div class="category-weight">40%</div>
                             </div>
                             <div class="signal-item">
                                 <div class="signal-name">Volume > 20-period Avg</div>
                                 <div class="signal-points">1</div>
                             </div>
                             <div class="signal-item">
-                                <div class="signal-name">No Bullish Divergence</div>
+                                <div class="signal-name">ทำโซนสะสม (หลุด/ยืน EMA20 4H)</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">สำหรับสวนเทรนด์ ! เกิด Bearish Divergence</div>
                                 <div class="signal-points">1</div>
                             </div>
                             <div class="signal-item">
@@ -832,14 +840,14 @@
                                 <div class="checkbox-points">1.5</div>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="long_momentum1" data-points="2">
+                                <input type="checkbox" id="long_momentum1" data-points="1.5">
                                 <label for="long_momentum1">MACD Signal Cross UP</label>
-                                <div class="checkbox-points">2</div>
+                                <div class="checkbox-points">1.5</div>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="long_momentum2" data-points="2">
+                                <input type="checkbox" id="long_momentum2" data-points="1.5">
                                 <label for="long_momentum2">RSI > EMA RSI 14</label>
-                                <div class="checkbox-points">2</div>
+                                <div class="checkbox-points">1.5</div>
                             </div>
                             <div class="checkbox-item">
                                 <input type="checkbox" id="long_timing1" data-points="1">
@@ -848,12 +856,17 @@
                             </div>
                             <div class="checkbox-item">
                                 <input type="checkbox" id="long_timing2" data-points="1">
-                                <label for="long_timing2">No Bearish Divergence</label>
+                                <label for="long_timing2">ทำโซนสะสม (หลุด/ยืน EMA20 4H)</label>
                                 <div class="checkbox-points">1</div>
                             </div>
                             <div class="checkbox-item">
                                 <input type="checkbox" id="long_timing3" data-points="1">
-                                <label for="long_timing3">Price > EMA 5 (4H)</label>
+                                <label for="long_timing3">สำหรับสวนเทรนด์ ! เกิด Bullish Divergence</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_timing4" data-points="1">
+                                <label for="long_timing4">Price > EMA 5 (4H)</label>
                                 <div class="checkbox-points">1</div>
                             </div>
                         </div>
@@ -871,14 +884,14 @@
                                 <div class="checkbox-points">1.5</div>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="short_momentum1" data-points="2">
+                                <input type="checkbox" id="short_momentum1" data-points="1.5">
                                 <label for="short_momentum1">MACD Signal Cross DOWN</label>
-                                <div class="checkbox-points">2</div>
+                                <div class="checkbox-points">1.5</div>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="short_momentum2" data-points="2">
+                                <input type="checkbox" id="short_momentum2" data-points="1.5">
                                 <label for="short_momentum2">RSI < EMA RSI 14</label>
-                                <div class="checkbox-points">2</div>
+                                <div class="checkbox-points">1.5</div>
                             </div>
                             <div class="checkbox-item">
                                 <input type="checkbox" id="short_timing1" data-points="1">
@@ -887,12 +900,17 @@
                             </div>
                             <div class="checkbox-item">
                                 <input type="checkbox" id="short_timing2" data-points="1">
-                                <label for="short_timing2">No Bullish Divergence</label>
+                                <label for="short_timing2">ทำโซนสะสม (หลุด/ยืน EMA20 4H)</label>
                                 <div class="checkbox-points">1</div>
                             </div>
                             <div class="checkbox-item">
                                 <input type="checkbox" id="short_timing3" data-points="1">
-                                <label for="short_timing3">Price < EMA 5 (4H)</label>
+                                <label for="short_timing3">สำหรับสวนเทรนด์ ! เกิด Bearish Divergence</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_timing4" data-points="1">
+                                <label for="short_timing4">Price < EMA 5 (4H)</label>
                                 <div class="checkbox-points">1</div>
                             </div>
                         </div>
@@ -1182,7 +1200,11 @@
                         <h4>📈 Signal Strength</h4>
                         <p><strong>8-10:</strong> Strong Signal 🔥<br>
                         <strong>6-7:</strong> Moderate Signal ⚡<br>
-                        <strong>&lt;6:</strong> Weak Signal ⚠️</p>
+                        <strong>&lt;6:</strong> Weak Signal ⚠️<br><br>
+                        <strong>📊 Weight Distribution:</strong><br>
+                        • TREND CONFIRMATION: 30% (3 คะแนน)<br>
+                        • MOMENTUM: 30% (3 คะแนน)<br>
+                        • ENTRY TIMING: 40% (4 คะแนน)</p>
                     </div>
                     <div class="tip-card">
                         <h4>🎯 TP Strategy Options</h4>
