@@ -810,28 +810,7 @@
                     <div class="calculator">
                         <h2 class="section-title">🧮 Score Calculator</h2>
                         
-                        <div class="input-group">
-                            <label for="cryptoPair">Crypto Pair:</label>
-                            <select id="cryptoPair">
-                                <option value="">เลือก Crypto Pair</option>
-                                <option value="BTC/USDT">BTC/USDT</option>
-                                <option value="ETH/USDT">ETH/USDT</option>
-                                <option value="BNB/USDT">BNB/USDT</option>
-                                <option value="ADA/USDT">ADA/USDT</option>
-                                <option value="SOL/USDT">SOL/USDT</option>
-                                <option value="DOT/USDT">DOT/USDT</option>
-                                <option value="MATIC/USDT">MATIC/USDT</option>
-                                <option value="AVAX/USDT">AVAX/USDT</option>
-                                <option value="LINK/USDT">LINK/USDT</option>
-                                <option value="UNI/USDT">UNI/USDT</option>
-                                <option value="custom">อื่นๆ (พิมพ์เอง)</option>
-                            </select>
-                        </div>
 
-                        <div class="input-group" id="customPairGroup" style="display:none;">
-                            <label for="customPair">พิมพ์ Crypto Pair:</label>
-                            <input type="text" id="customPair" placeholder="เช่น DOGE/USDT, XRP/USDT">
-                        </div>
 
                         <!-- Long Checkboxes -->
                         <div class="checkbox-group mode-content mode-long">
@@ -1657,7 +1636,7 @@
             
             // Reset form inputs
             const elements = [
-                'cryptoPair', 'customPair', 'riskAmount', 'stopLossPercent', 
+                'riskAmount', 'stopLossPercent', 
                 'positionSize', 'tp1', 'tp2', 'tp3', 'tp4', 'tp5',
                 'weight1', 'weight2', 'weight3', 'weight4', 'weight5'
             ];
@@ -1668,7 +1647,7 @@
             });
             
             // Hide sections
-            const sections = ['customPairGroup', 'positionResults', 'tpResults', 'cutlossResults'];
+            const sections = ['positionResults', 'tpResults', 'cutlossResults'];
             sections.forEach(id => {
                 const element = document.getElementById(id);
                 if (element) element.style.display = 'none';
@@ -1682,16 +1661,6 @@
             updateCutLossStatus();
             setDefaultValues();
         }
-
-        // Handle custom pair selection
-        document.getElementById('cryptoPair').addEventListener('change', function() {
-            const customGroup = document.getElementById('customPairGroup');
-            if (this.value === 'custom') {
-                customGroup.style.display = 'block';
-            } else {
-                customGroup.style.display = 'none';
-            }
-        });
 
         // Add event listeners to all checkboxes
         document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
