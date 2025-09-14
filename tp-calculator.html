@@ -3,271 +3,608 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Take Profit Strategy Comparison</title>
+    <title>Crypto Trading Signal Scoring System - Updated</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
             min-height: 100vh;
             padding: 20px;
-            color: #333;
+            color: #1f2937;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            border: 2px solid #0ea5e9;
         }
-        
+
         .header {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
             color: white;
             padding: 30px;
             text-align: center;
+            position: relative;
+            border-bottom: 3px solid #0284c7;
         }
-        
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="crypto" patternUnits="userSpaceOnUse" width="20" height="20"><circle cx="10" cy="10" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23crypto)"/></svg>');
+            opacity: 0.3;
+        }
+
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 2.8rem;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+            position: relative;
+            z-index: 1;
         }
-        
+
         .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
+            font-size: 1.3rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
         }
-        
-        .content {
+
+        .trading-mode {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mode-btn {
+            padding: 12px 25px;
+            border: 2px solid rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .mode-btn:hover, .mode-btn.active {
+            background: rgba(255,255,255,0.3);
+            border-color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255,255,255,0.2);
+        }
+
+        .main-content {
             padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
         }
-        
-        .section {
-            margin-bottom: 40px;
+
+        .scoring-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #0ea5e9;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.1);
         }
-        
+
         .section-title {
-            font-size: 1.8rem;
-            color: #2c3e50;
+            font-size: 1.5rem;
+            color: #0369a1;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 10px;
-        }
-        
-        .current-system {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 15px;
-            border-left: 5px solid #6c757d;
-            margin-bottom: 30px;
-        }
-        
-        .strategies-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .strategy-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            border-top: 5px solid;
-            transition: transform 0.3s ease;
-        }
-        
-        .strategy-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .strategy-1 {
-            border-top-color: #27ae60;
-        }
-        
-        .strategy-2 {
-            border-top-color: #f39c12;
-        }
-        
-        .strategy-3 {
-            border-top-color: #e74c3c;
-        }
-        
-        .strategy-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .strategy-title {
-            font-size: 1.3rem;
             font-weight: bold;
-            margin-bottom: 5px;
         }
-        
-        .strategy-subtitle {
-            color: #6c757d;
-            font-size: 0.9rem;
+
+        .category {
+            margin-bottom: 20px;
+            padding: 18px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid #0ea5e9;
+            border: 1px solid #e2e8f0;
         }
-        
-        .rr-display {
-            text-align: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #0369a1;
+        }
+
+        .category-weight {
+            background: linear-gradient(45deg, #0ea5e9, #10b981);
             color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .rr-number {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-        
-        .rr-change {
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        
-        .allocation-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        
-        .allocation-table th,
-        .allocation-table td {
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #dee2e6;
-        }
-        
-        .allocation-table th {
-            background: #f8f9fa;
             font-weight: bold;
         }
-        
-        .allocation-table td:last-child {
-            font-weight: bold;
-        }
-        
-        .pros-cons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        .pros, .cons {
-            padding: 15px;
-            border-radius: 10px;
-        }
-        
-        .pros {
-            background: #d4edda;
-            border-left: 4px solid #28a745;
-        }
-        
-        .cons {
-            background: #f8d7da;
-            border-left: 4px solid #dc3545;
-        }
-        
-        .pros h4, .cons h4 {
-            margin-bottom: 10px;
+
+        .signal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
             font-size: 1rem;
         }
-        
-        .pros ul, .cons ul {
-            margin-left: 20px;
+
+        .signal-item:last-child {
+            border-bottom: none;
         }
-        
-        .comparison-table {
+
+        .signal-name {
+            flex: 1;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .signal-points {
+            background: linear-gradient(45deg, #0ea5e9, #10b981);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .calculator {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px solid #10b981;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #0369a1;
+            font-size: 1rem;
+        }
+
+        .input-group input, .input-group select {
             width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .comparison-table th {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-        
-        .comparison-table td {
             padding: 12px;
-            text-align: center;
-            border-bottom: 1px solid #dee2e6;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #ffffff;
+            color: #1f2937;
         }
-        
-        .comparison-table tr:nth-child(even) {
-            background: #f8f9fa;
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
         }
-        
-        .highlight {
-            background: #fff3cd !important;
+
+        .input-group input:read-only {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: #0369a1;
+            font-weight: bold;
+            border-color: #0ea5e9;
+        }
+
+        .checkbox-group {
+            display: grid;
+            gap: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #e2e8f0;
+        }
+
+        .checkbox-item:hover {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border-color: #0ea5e9;
+            transform: translateY(-1px);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 12px;
+            transform: scale(1.3);
+            accent-color: #0ea5e9;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .checkbox-points {
+            background: linear-gradient(45deg, #0ea5e9, #10b981);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-size: 0.9rem;
             font-weight: bold;
         }
-        
-        .recommendation {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            margin-top: 30px;
-        }
-        
-        .recommendation h3 {
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-        }
-        
-        .warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 10px;
-            padding: 20px;
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
             margin-top: 20px;
         }
-        
-        .warning h4 {
-            color: #856404;
+
+        .btn {
+            flex: 1;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-reset {
+            background: linear-gradient(45deg, #f97316, #ea580c);
+            color: white;
+            border: 2px solid #f97316;
+        }
+
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(249, 115, 22, 0.3);
+        }
+
+        .btn-long {
+            background: linear-gradient(45deg, #10b981, #059669);
+            color: white;
+            border: 2px solid #10b981;
+        }
+
+        .btn-long:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-short {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
+            border: 2px solid #ef4444;
+        }
+
+        .btn-short:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            border: 2px solid #0284c7;
+        }
+
+        .score-display {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .signal-strength {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .recommendation {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .position-results {
+            margin-top: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 12px;
+            border: 2px solid #0ea5e9;
+        }
+
+        .result-card {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .result-card h4 {
             margin-bottom: 10px;
+            font-size: 1.2rem;
         }
-        
-        .warning ul {
-            color: #856404;
-            margin-left: 20px;
+
+        .position-size {
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-        
+
+        .result-details {
+            display: grid;
+            gap: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 8px;
+            font-size: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .detail-item span:first-child {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .detail-item span:last-child {
+            color: #0369a1;
+            font-weight: bold;
+        }
+
+        .tp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .tp-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .tp-item label {
+            font-weight: bold;
+            color: #0369a1;
+            font-size: 1rem;
+        }
+
+        .tp-item input {
+            padding: 10px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #ffffff;
+            color: #1f2937;
+        }
+
+        .tp-item input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .weight-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .tp-results {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #10b981;
+        }
+
+        .tp-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .avg-tp, .rr-ratio {
+            padding: 15px;
+            background: linear-gradient(45deg, #0ea5e9, #10b981);
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .tp-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .tp-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tp-breakdown {
+            display: grid;
+            gap: 10px;
+        }
+
+        .tp-level {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 8px;
+            font-size: 1rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .tp-level span:first-child {
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .tp-level span:last-child {
+            color: #0369a1;
+            font-weight: bold;
+        }
+
+        .strategy-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .strategy-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px 20px;
+            border: 2px solid #cbd5e1;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            color: #374151;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 1rem;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .strategy-btn:hover {
+            border-color: #0ea5e9;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(14, 165, 233, 0.2);
+        }
+
+        .strategy-btn.active {
+            border-color: #0ea5e9;
+            background: linear-gradient(135deg, #0ea5e9 0%, #10b981 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(14, 165, 233, 0.3);
+        }
+
+        .strategy-btn small {
+            display: block;
+            margin-top: 5px;
+            opacity: 0.8;
+            font-size: 0.85rem;
+            font-weight: normal;
+        }
+
+        .mode-long .category {
+            border-left-color: #10b981;
+        }
+
+        .mode-short .category {
+            border-left-color: #ef4444;
+        }
+
+        .hidden {
+            display: none;
+        }
+
         @media (max-width: 768px) {
-            .strategies-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .pros-cons {
-                grid-template-columns: 1fr;
-            }
-            
             .header h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
+            }
+            
+            .score-display {
+                font-size: 3rem;
+            }
+
+            .trading-mode {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .tp-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .strategy-buttons {
+                flex-direction: column;
+            }
+
+            .strategy-btn {
+                min-width: auto;
+                width: 100%;
             }
         }
     </style>
@@ -275,258 +612,734 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Take Profit Strategy Comparison</h1>
-            <p>เปรียบเทียบ 3 กลยุทธ์การปรับสัดส่วน TP เพื่อเพิ่ม Risk:Reward Ratio</p>
+            <h1>🚀 Crypto Trading Signal Scoring</h1>
+            <p>ระบบให้คะแนนสัญญาณการเทรดคริปโตแบบมืออาชีพ - Updated</p>
+            
+            <div class="trading-mode">
+                <div class="mode-btn active" onclick="setMode('long')">📈 LONG SIGNALS</div>
+                <div class="mode-btn" onclick="setMode('short')">📉 SHORT SIGNALS</div>
+            </div>
         </div>
-        
-        <div class="content">
-            <!-- Current System -->
-            <div class="section">
-                <h2 class="section-title">📈 ระบบปัจจุบัน</h2>
-                <div class="current-system">
-                    <h3>⚖️ การกระจาย TP แบบเท่ากัน (20% ทุกชุด)</h3>
-                    <table class="allocation-table">
-                        <thead>
-                            <tr>
-                                <th>TP Level</th>
-                                <th>1.0R</th>
-                                <th>1.5R</th>
-                                <th>2.0R</th>
-                                <th>2.5R</th>
-                                <th>3.0R</th>
-                                <th>RR เฉลี่ย</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>สัดส่วน</strong></td>
-                                <td>20%</td>
-                                <td>20%</td>
-                                <td>20%</td>
-                                <td>20%</td>
-                                <td>20%</td>
-                                <td class="highlight">2.00</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <p><strong>ปัญหา:</strong> ปิดกำไรเร็วเกินไป พลาดโอกาสจาก trend ที่ยาว</p>
+
+        <div class="main-content" id="mainContent">
+            <!-- Signal Scoring Section -->
+            <div class="scoring-section">
+                <h2 class="section-title">📊 Signal Scoring System</h2>
+                
+                <div class="two-column">
+                    <!-- Long Scoring -->
+                    <div class="mode-content mode-long">
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">🎯 TREND CONFIRMATION</div>
+                                <div class="category-weight">30%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Dow Theory Bullish</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Price > EMA 20 Daily</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                        </div>
+
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">📈 MOMENTUM</div>
+                                <div class="category-weight">30%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">MACD 4H Signal Cross UP</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">RSI > EMA RSI 14 (4H)</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                        </div>
+
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">🔍 ENTRY TIMING</div>
+                                <div class="category-weight">40%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Volume > 20-period Avg</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">ทำโซนสะสม (หลุด/ยืน EMA20 4H)</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">สำหรับสวนเทรนด์ ! เกิด Bullish Divergence</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Price > EMA 5 (4H)</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Short Scoring -->
+                    <div class="mode-content mode-short hidden">
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">🎯 TREND CONFIRMATION</div>
+                                <div class="category-weight">30%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Dow Theory Bearish</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Price < EMA 20 Daily</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                        </div>
+
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">📈 MOMENTUM</div>
+                                <div class="category-weight">30%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">MACD 4H Signal Cross DOWN</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">RSI < EMA RSI 14 (4H)</div>
+                                <div class="signal-points">1.5</div>
+                            </div>
+                        </div>
+
+                        <div class="category">
+                            <div class="category-header">
+                                <div class="category-title">🔍 ENTRY TIMING</div>
+                                <div class="category-weight">40%</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Volume > 20-period Avg</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">ทำโซนสะสม (หลุด/ยืน EMA20 4H)</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">สำหรับสวนเทรนด์ ! เกิด Bearish Divergence</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                            <div class="signal-item">
+                                <div class="signal-name">Price < EMA 5 (4H)</div>
+                                <div class="signal-points">1</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculator Section -->
+                    <div class="calculator">
+                        <h2 class="section-title">🧮 Score Calculator</h2>
+                        
+                        <!-- Long Checkboxes -->
+                        <div class="checkbox-group mode-content mode-long">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_trend1" data-points="1.5">
+                                <label for="long_trend1">Dow Theory Bullish</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_trend2" data-points="1.5">
+                                <label for="long_trend2">Price > EMA 20 Daily</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_momentum1" data-points="1.5">
+                                <label for="long_momentum1">MACD Signal Cross UP</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_momentum2" data-points="1.5">
+                                <label for="long_momentum2">RSI > EMA RSI 14</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_timing1" data-points="1">
+                                <label for="long_timing1">Volume > Average</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_timing2" data-points="1">
+                                <label for="long_timing2">ทำโซนสะสม (หลุด/ยืน EMA20 4H)</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_timing3" data-points="1">
+                                <label for="long_timing3">สำหรับสวนเทรนด์ ! เกิด Bullish Divergence</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="long_timing4" data-points="1">
+                                <label for="long_timing4">Price > EMA 5 (4H)</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                        </div>
+
+                        <!-- Short Checkboxes -->
+                        <div class="checkbox-group mode-content mode-short hidden">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_trend1" data-points="1.5">
+                                <label for="short_trend1">Dow Theory Bearish</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_trend2" data-points="1.5">
+                                <label for="short_trend2">Price < EMA 20 Daily</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_momentum1" data-points="1.5">
+                                <label for="short_momentum1">MACD Signal Cross DOWN</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_momentum2" data-points="1.5">
+                                <label for="short_momentum2">RSI < EMA RSI 14</label>
+                                <div class="checkbox-points">1.5</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_timing1" data-points="1">
+                                <label for="short_timing1">Volume > Average</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_timing2" data-points="1">
+                                <label for="short_timing2">ทำโซนสะสม (หลุด/ยืน EMA20 4H)</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_timing3" data-points="1">
+                                <label for="short_timing3">สำหรับสวนเทรนด์ ! เกิด Bearish Divergence</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="short_timing4" data-points="1">
+                                <label for="short_timing4">Price < EMA 5 (4H)</label>
+                                <div class="checkbox-points">1</div>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button class="btn btn-reset" onclick="resetCalculator()">🔄 รีเซ็ต</button>
+                            <button class="btn btn-long mode-content mode-long" onclick="setMode('long')">📈 LONG</button>
+                            <button class="btn btn-short mode-content mode-long" onclick="setMode('short')">📉 SHORT</button>
+                            <button class="btn btn-long mode-content mode-short hidden" onclick="setMode('long')">📈 LONG</button>
+                            <button class="btn btn-short mode-content mode-short" onclick="setMode('short')">📉 SHORT</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <!-- Three Strategies -->
-            <div class="section">
-                <h2 class="section-title">🚀 3 กลยุทธ์ใหม่</h2>
-                <div class="strategies-grid">
-                    <!-- Strategy 1 -->
-                    <div class="strategy-card strategy-1">
-                        <div class="strategy-header">
-                            <div class="strategy-title">🥇 STRATEGY 1</div>
-                            <div class="strategy-subtitle">Conservative Growth</div>
+
+            <!-- Result Section -->
+            <div class="result-section">
+                <h2>📊 ผลการวิเคราะห์</h2>
+                <div class="score-display" id="totalScore">0/10</div>
+                <div class="signal-strength" id="signalStrength">เลือกโหมดการเทรด</div>
+                <div class="recommendation" id="recommendation">
+                    เลือก LONG หรือ SHORT mode แล้วป้อนข้อมูลการวิเคราะห์ของคุณ
+                </div>
+            </div>
+
+            <!-- Position Size Calculator -->
+            <div class="scoring-section calculator">
+                <h2 class="section-title">💰 Position Size Calculator</h2>
+                
+                <div class="two-column">
+                    <div>
+                        <div class="input-group">
+                            <label for="riskAmount">ยอมรับขาดทุน (USDT):</label>
+                            <input type="number" id="riskAmount" placeholder="เช่น 250" step="0.01" oninput="calculatePosition()">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="stopLossPercent">Stop Loss (%):</label>
+                            <input type="number" id="stopLossPercent" placeholder="เช่น 2.5" step="0.1" oninput="calculatePosition()">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="positionSize">POSITION ที่ซื้อได้ (USDT):</label>
+                            <input type="number" id="positionSize" placeholder="คำนวดอัตโนมัติ" readonly>
+                        </div>
+
+                        <div class="btn-group" style="margin-top: 20px;">
+                            <button class="btn btn-reset" onclick="resetPositionCalculator()" type="button">🔄 Reset Position</button>
+                        </div>
+                    </div>
+
+                    <div class="position-results" id="positionResults" style="display: none;">
+                        <div class="result-card">
+                            <h4>📊 Position Size</h4>
+                            <div class="position-size" id="positionSizeDisplay">0 USDT</div>
                         </div>
                         
-                        <div class="rr-display">
-                            <div class="rr-number">2.15</div>
-                            <div class="rr-change">+7.5% จากเดิม</div>
+                        <div class="result-details">
+                            <div class="detail-item">
+                                <span>ยอมรับขาดทุน:</span>
+                                <span id="displayRiskAmount">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Stop Loss:</span>
+                                <span id="displayStopLoss">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>Position Size:</span>
+                                <span id="displayPositionSize">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span>แนะนำ Position:</span>
+                                <span id="recommendedPosition">-</span>
+                            </div>
                         </div>
-                        
-                        <table class="allocation-table">
-                            <thead>
-                                <tr>
-                                    <th>TP</th>
-                                    <th>สัดส่วน</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>1.0R</td><td>15%</td></tr>
-                                <tr><td>1.5R</td><td>15%</td></tr>
-                                <tr><td>2.0R</td><td>20%</td></tr>
-                                <tr><td>2.5R</td><td>25%</td></tr>
-                                <tr><td>3.0R</td><td>25%</td></tr>
-                            </tbody>
-                        </table>
-                        
-                        <div class="pros-cons">
-                            <div class="pros">
-                                <h4>✅ ข้อดี</h4>
-                                <ul>
-                                    <li>ความเสี่ยงต่ำ</li>
-                                    <li>เหมาะกับผู้เริ่มต้น</li>
-                                    <li>ปรับตัวง่าย</li>
-                                </ul>
-                            </div>
-                            <div class="cons">
-                                <h4>❌ ข้อเสีย</h4>
-                                <ul>
-                                    <li>RR เพิ่มน้อย</li>
-                                    <li>ยังปิดเร็วเกินไป</li>
-                                </ul>
-                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Take Profit Calculator -->
+            <div class="scoring-section calculator">
+                <h2 class="section-title">🎯 Take Profit Calculator</h2>
+                
+                <div class="strategy-selection" style="margin-bottom: 20px;">
+                    <h3 style="color: #0369a1; margin-bottom: 15px; font-weight: bold;">📈 เลือก TP Strategy:</h3>
+                    <div class="strategy-buttons">
+                        <button class="strategy-btn active" data-strategy="1" onclick="applyStrategy(1)">
+                            🥇 STRATEGY 1<br>
+                            <small>Conservative Growth (RR: 2.00)</small>
+                        </button>
+                        <button class="strategy-btn" data-strategy="1.5" onclick="applyStrategy(1.5)">
+                            🚀 STRATEGY 1.5<br>
+                            <small>Alt Season Optimized (RR: 2.15)</small>
+                        </button>
+                        <button class="strategy-btn" data-strategy="2" onclick="applyStrategy(2)">
+                            🥈 STRATEGY 2<br>
+                            <small>Aggressive Growth (RR: 2.25)</small>
+                        </button>
+                        <button class="strategy-btn" data-strategy="3" onclick="applyStrategy(3)">
+                            🥉 STRATEGY 3<br>
+                            <small>Let Profit Run (RR: 2.35)</small>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tp-grid">
+                    <div class="tp-item">
+                        <label>TP1 (%) - R:R 1:1:</label>
+                        <input type="number" id="tp1" placeholder="SL × 1.0" step="0.1" oninput="calculateTakeProfit()">
+                        <label>Weight (%):</label>
+                        <input type="number" id="weight1" placeholder="20" step="1" oninput="calculateTakeProfit()">
+                    </div>
+                    <div class="tp-item">
+                        <label>TP2 (%) - R:R 1:1.5:</label>
+                        <input type="number" id="tp2" placeholder="SL × 1.5" step="0.1" oninput="calculateTakeProfit()">
+                        <label>Weight (%):</label>
+                        <input type="number" id="weight2" placeholder="20" step="1" oninput="calculateTakeProfit()">
+                    </div>
+                    <div class="tp-item">
+                        <label>TP3 (%) - R:R 1:2:</label>
+                        <input type="number" id="tp3" placeholder="SL × 2.0" step="0.1" oninput="calculateTakeProfit()">
+                        <label>Weight (%):</label>
+                        <input type="number" id="weight3" placeholder="20" step="1" oninput="calculateTakeProfit()">
+                    </div>
+                    <div class="tp-item">
+                        <label>TP4 (%) - R:R 1:2.5:</label>
+                        <input type="number" id="tp4" placeholder="SL × 2.5" step="0.1" oninput="calculateTakeProfit()">
+                        <label>Weight (%):</label>
+                        <input type="number" id="weight4" placeholder="20" step="1" oninput="calculateTakeProfit()">
+                    </div>
+                    <div class="tp-item">
+                        <label>TP5 (%) - R:R 1:3:</label>
+                        <input type="number" id="tp5" placeholder="SL × 3.0" step="0.1" oninput="calculateTakeProfit()">
+                        <label>Weight (%):</label>
+                        <input type="number" id="weight5" placeholder="20" step="1" oninput="calculateTakeProfit()">
+                    </div>
+                </div>
+
+                <div class="tp-results" id="tpResults" style="display: none;">
+                    <div class="tp-summary">
+                        <div class="avg-tp">
+                            <div class="tp-label">TP เฉลี่ย</div>
+                            <div class="tp-value" id="averageTP">0%</div>
+                        </div>
+                        <div class="rr-ratio">
+                            <div class="tp-label">R:R Ratio เฉลี่ย</div>
+                            <div class="tp-value" id="rrRatio">0:0</div>
                         </div>
                     </div>
                     
-                    <!-- Strategy 2 -->
-                    <div class="strategy-card strategy-2">
-                        <div class="strategy-header">
-                            <div class="strategy-title">🥈 STRATEGY 2</div>
-                            <div class="strategy-subtitle">Aggressive Growth</div>
+                    <div class="tp-breakdown">
+                        <div class="tp-level">
+                            <span>TP1:</span>
+                            <span id="tp1Split">$0 (0%)</span>
                         </div>
-                        
-                        <div class="rr-display">
-                            <div class="rr-number">2.25</div>
-                            <div class="rr-change">+12.5% จากเดิม</div>
+                        <div class="tp-level">
+                            <span>TP2:</span>
+                            <span id="tp2Split">$0 (0%)</span>
                         </div>
-                        
-                        <table class="allocation-table">
-                            <thead>
-                                <tr>
-                                    <th>TP</th>
-                                    <th>สัดส่วน</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>1.0R</td><td>10%</td></tr>
-                                <tr><td>1.5R</td><td>15%</td></tr>
-                                <tr><td>2.0R</td><td>20%</td></tr>
-                                <tr><td>2.5R</td><td>25%</td></tr>
-                                <tr><td>3.0R</td><td>30%</td></tr>
-                            </tbody>
-                        </table>
-                        
-                        <div class="pros-cons">
-                            <div class="pros">
-                                <h4>✅ ข้อดี</h4>
-                                <ul>
-                                    <li>RR ดีขึ้นเห็นได้ชัด</li>
-                                    <li>สมดุลเสี่ยง-ผลตอบแทน</li>
-                                    <li>เหมาะกับส่วนใหญ่</li>
-                                </ul>
-                            </div>
-                            <div class="cons">
-                                <h4>❌ ข้อเสีย</h4>
-                                <ul>
-                                    <li>ต้องมีวินัยมากขึ้น</li>
-                                    <li>อาจพลาด TP ปลาย</li>
-                                </ul>
-                            </div>
+                        <div class="tp-level">
+                            <span>TP3:</span>
+                            <span id="tp3Split">$0 (0%)</span>
                         </div>
-                    </div>
-                    
-                    <!-- Strategy 3 -->
-                    <div class="strategy-card strategy-3">
-                        <div class="strategy-header">
-                            <div class="strategy-title">🥉 STRATEGY 3</div>
-                            <div class="strategy-subtitle">Let Profit Run</div>
+                        <div class="tp-level">
+                            <span>TP4:</span>
+                            <span id="tp4Split">$0 (0%)</span>
                         </div>
-                        
-                        <div class="rr-display">
-                            <div class="rr-number">2.35</div>
-                            <div class="rr-change">+17.5% จากเดิม</div>
-                        </div>
-                        
-                        <table class="allocation-table">
-                            <thead>
-                                <tr>
-                                    <th>TP</th>
-                                    <th>สัดส่วน</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>1.0R</td><td>10%</td></tr>
-                                <tr><td>1.5R</td><td>10%</td></tr>
-                                <tr><td>2.0R</td><td>20%</td></tr>
-                                <tr><td>2.5R</td><td>30%</td></tr>
-                                <tr><td>3.0R</td><td>30%</td></tr>
-                            </tbody>
-                        </table>
-                        
-                        <div class="pros-cons">
-                            <div class="pros">
-                                <h4>✅ ข้อดี</h4>
-                                <ul>
-                                    <li>RR สูงสุด</li>
-                                    <li>ใช้ประโยชน์จาก trend</li>
-                                    <li>กำไรสูงสุด</li>
-                                </ul>
-                            </div>
-                            <div class="cons">
-                                <h4>❌ ข้อเสีย</h4>
-                                <ul>
-                                    <li>ความเสี่ยงสูง</li>
-                                    <li>ต้องใจเย็น</li>
-                                    <li>เหมาะกับมืออาชีพ</li>
-                                </ul>
-                            </div>
+                        <div class="tp-level">
+                            <span>TP5:</span>
+                            <span id="tp5Split">$0 (0%)</span>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Comparison Table -->
-            <div class="section">
-                <h2 class="section-title">📊 ตารางเปรียบเทียบ</h2>
-                <table class="comparison-table">
-                    <thead>
-                        <tr>
-                            <th>กลยุทธ์</th>
-                            <th>RR Ratio</th>
-                            <th>เพิ่มขึ้น</th>
-                            <th>ความเสี่ยง</th>
-                            <th>เหมาะสำหรับ</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>ระบบเดิม</strong></td>
-                            <td>2.00</td>
-                            <td>-</td>
-                            <td>ต่ำ</td>
-                            <td>ทุกคน</td>
-                        </tr>
-                        <tr class="highlight">
-                            <td><strong>Strategy 1</strong></td>
-                            <td>2.15</td>
-                            <td>+7.5%</td>
-                            <td>ต่ำ</td>
-                            <td>ผู้เริ่มต้นปรับระบบ</td>
-                        </tr>
-                        <tr class="highlight">
-                            <td><strong>Strategy 2</strong></td>
-                            <td>2.25</td>
-                            <td>+12.5%</td>
-                            <td>ปานกลาง</td>
-                            <td>เทรดเดอร์ทั่วไป</td>
-                        </tr>
-                        <tr class="highlight">
-                            <td><strong>Strategy 3</strong></td>
-                            <td>2.35</td>
-                            <td>+17.5%</td>
-                            <td>สูง</td>
-                            <td>เทรดเดอร์มีประสบการณ์</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Recommendation -->
-            <div class="recommendation">
-                <h3>🎯 คำแนะนำ</h3>
-                <p><strong>เริ่มต้นด้วย Strategy 2</strong> เพราะให้สมดุลที่ดีระหว่างความเสี่ยงและผลตอบแทน</p>
-                <p>หลังใช้ 2-3 เดือน หากมั่นใจในระบบแล้ว สามารถไป Strategy 3 ได้</p>
-                <p><strong>สำคัญ:</strong> ต้อง Backtest และ Paper Trade ก่อนใช้เงินจริง</p>
-            </div>
-            
-            <!-- Warning -->
-            <div class="warning">
-                <h4>⚠️ ข้อควรระวัง</h4>
-                <ul>
-                    <li><strong>Market Condition:</strong> ตลาด Choppy อาจไม่เอื้อให้ถึง TP ปลาย</li>
-                    <li><strong>Psychology:</strong> ต้องมีวินัยไม่ปิดก่อนเวลา</li>
-                    <li><strong>Backtesting:</strong> ทดสอบด้วยข้อมูลย้อนหลัง 6-12 เดือน</li>
-                    <li><strong>Paper Trading:</strong> ฝึกใช้ระบบใหม่ 1 เดือนก่อนใช้เงินจริง</li>
-                    <li><strong>Trailing Stop:</strong> ใช้ร่วมกับ Trailing Stop เพื่อป้องกันกำไร</li>
-                </ul>
             </div>
         </div>
     </div>
+
+    <script>
+        let currentMode = 'long';
+
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update mode buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.mode-btn[onclick="setMode('${mode}')"]`).classList.add('active');
+            
+            // Show/hide content
+            document.querySelectorAll('.mode-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll(`.mode-${mode}`).forEach(el => el.classList.remove('hidden'));
+            
+            // Update container class for styling
+            document.getElementById('mainContent').className = `main-content mode-${mode}`;
+            
+            // Reset and update score
+            updateScore();
+            
+            // Set default values
+            setDefaultValues();
+            
+            // Recalculate position if data exists
+            calculatePosition();
+        }
+
+        function setDefaultValues() {
+            // Set default weight values using STRATEGY 1 (Conservative Growth) if fields are empty
+            if (!document.getElementById('weight1').value) {
+                document.getElementById('weight1').value = '20';
+            }
+            if (!document.getElementById('weight2').value) {
+                document.getElementById('weight2').value = '20';
+            }
+            if (!document.getElementById('weight3').value) {
+                document.getElementById('weight3').value = '20';
+            }
+            if (!document.getElementById('weight4').value) {
+                document.getElementById('weight4').value = '20';
+            }
+            if (!document.getElementById('weight5').value) {
+                document.getElementById('weight5').value = '20';
+            }
+        }
+
+        function applyStrategy(strategyNumber) {
+            // Update active button
+            document.querySelectorAll('.strategy-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-strategy="${strategyNumber}"]`).classList.add('active');
+            
+            // Apply strategy weights
+            switch(strategyNumber) {
+                case 1: // Conservative Growth
+                    document.getElementById('weight1').value = '20';
+                    document.getElementById('weight2').value = '20';
+                    document.getElementById('weight3').value = '20';
+                    document.getElementById('weight4').value = '20';
+                    document.getElementById('weight5').value = '20';
+                    break;
+                case 1.5: // Alt Season Optimized
+                    document.getElementById('weight1').value = '15';
+                    document.getElementById('weight2').value = '15';
+                    document.getElementById('weight3').value = '20';
+                    document.getElementById('weight4').value = '25';
+                    document.getElementById('weight5').value = '25';
+                    break;
+                case 2: // Aggressive Growth
+                    document.getElementById('weight1').value = '10';
+                    document.getElementById('weight2').value = '15';
+                    document.getElementById('weight3').value = '20';
+                    document.getElementById('weight4').value = '25';
+                    document.getElementById('weight5').value = '30';
+                    break;
+                case 3: // Let Profit Run
+                    document.getElementById('weight1').value = '10';
+                    document.getElementById('weight2').value = '10';
+                    document.getElementById('weight3').value = '20';
+                    document.getElementById('weight4').value = '30';
+                    document.getElementById('weight5').value = '30';
+                    break;
+            }
+            
+            // Recalculate if position data exists
+            calculateTakeProfit();
+        }
+
+        function updateScore() {
+            let totalScore = 0;
+            const activeCheckboxes = document.querySelectorAll(`.mode-${currentMode} input[type="checkbox"]:checked`);
+            
+            activeCheckboxes.forEach(checkbox => {
+                totalScore += parseFloat(checkbox.dataset.points);
+            });
+
+            document.getElementById('totalScore').textContent = totalScore.toFixed(1) + '/10';
+
+            let strength = '';
+            let recommendation = '';
+            let strengthColor = '';
+
+            if (totalScore >= 8) {
+                strength = currentMode === 'long' ? 'Strong LONG Signal 🔥' : 'Strong SHORT Signal 🔥';
+                recommendation = `สัญญาณแรงมาก! เหมาะสำหรับการเทรด ${currentMode.toUpperCase()} แต่อย่าลืม Risk Management และ S/R Analysis`;
+                strengthColor = '#10b981';
+            } else if (totalScore >= 6) {
+                strength = currentMode === 'long' ? 'Moderate LONG Signal ⚡' : 'Moderate SHORT Signal ⚡';
+                recommendation = `สัญญาณปานกลาง ใช้ความระมัดระวังเพิ่มเติม ลดขนาดการเทรด ${currentMode.toUpperCase()}`;
+                strengthColor = '#f59e0b';
+            } else if (totalScore > 0) {
+                strength = 'Weak Signal ⚠️';
+                recommendation = `สัญญาณอ่อน ไม่แนะนำให้เทรดในขณะนี้ รอสัญญาณที่ชัดเจนกว่า`;
+                strengthColor = '#ef4444';
+            } else {
+                strength = 'เลือกสัญญาณที่ตรงกับการวิเคราะห์';
+                recommendation = `เลือก ${currentMode.toUpperCase()} mode แล้วติ๊กเลือกสัญญาณที่ตรงกับการวิเคราะห์ของคุณ`;
+                strengthColor = '#6b7280';
+            }
+
+            document.getElementById('signalStrength').textContent = strength;
+            document.getElementById('signalStrength').style.color = strengthColor;
+            document.getElementById('recommendation').textContent = recommendation;
+
+            // Update score display color
+            const scoreDisplay = document.getElementById('totalScore');
+            scoreDisplay.style.color = strengthColor;
+        }
+
+        function calculatePosition() {
+            const riskAmount = parseFloat(document.getElementById('riskAmount').value);
+            const stopLossPercent = parseFloat(document.getElementById('stopLossPercent').value);
+
+            if (!riskAmount || !stopLossPercent || riskAmount <= 0 || stopLossPercent <= 0) {
+                document.getElementById('positionSize').value = '';
+                document.getElementById('positionResults').style.display = 'none';
+                return;
+            }
+
+            // Calculate position size: Risk Amount / Stop Loss %
+            const positionSizeValue = riskAmount / (stopLossPercent / 100);
+            
+            // Update the POSITION input field
+            document.getElementById('positionSize').value = positionSizeValue.toFixed(2);
+            
+            // Calculate recommended position (typically 50-75% of max position)
+            const recommendedMin = positionSizeValue * 0.5;
+            const recommendedMax = positionSizeValue * 0.75;
+
+            // Update display in results section
+            document.getElementById('positionSizeDisplay').textContent = `${positionSizeValue.toFixed(2)} USDT`;
+            document.getElementById('displayRiskAmount').textContent = `${riskAmount.toFixed(2)} USDT`;
+            document.getElementById('displayStopLoss').textContent = `${stopLossPercent}%`;
+            document.getElementById('displayPositionSize').textContent = `${positionSizeValue.toFixed(2)} USDT`;
+            document.getElementById('recommendedPosition').textContent = `${recommendedMin.toFixed(0)}-${recommendedMax.toFixed(0)} USDT`;
+            
+            document.getElementById('positionResults').style.display = 'block';
+            
+            // Auto-update default TP values based on Stop Loss
+            updateDefaultTPValues(stopLossPercent);
+            
+            // Calculate TP if values exist
+            calculateTakeProfit();
+        }
+
+        function updateDefaultTPValues(stopLossPercent) {
+            // Update default TP values based on Stop Loss ONLY if field is empty
+            if (!document.getElementById('tp1').value) {
+                document.getElementById('tp1').value = (stopLossPercent * 1.0).toFixed(2);
+            }
+            if (!document.getElementById('tp2').value) {
+                document.getElementById('tp2').value = (stopLossPercent * 1.5).toFixed(2);
+            }
+            if (!document.getElementById('tp3').value) {
+                document.getElementById('tp3').value = (stopLossPercent * 2.0).toFixed(2);
+            }
+            if (!document.getElementById('tp4').value) {
+                document.getElementById('tp4').value = (stopLossPercent * 2.5).toFixed(2);
+            }
+            if (!document.getElementById('tp5').value) {
+                document.getElementById('tp5').value = (stopLossPercent * 3.0).toFixed(2);
+            }
+        }
+
+        function calculateTakeProfit() {
+            const positionSize = parseFloat(document.getElementById('positionSize').value);
+            const stopLoss = parseFloat(document.getElementById('stopLossPercent').value);
+            
+            if (!positionSize || !stopLoss) {
+                document.getElementById('tpResults').style.display = 'none';
+                return;
+            }
+
+            // Get TP values
+            const tp1 = parseFloat(document.getElementById('tp1').value) || 0;
+            const tp2 = parseFloat(document.getElementById('tp2').value) || 0;
+            const tp3 = parseFloat(document.getElementById('tp3').value) || 0;
+            const tp4 = parseFloat(document.getElementById('tp4').value) || 0;
+            const tp5 = parseFloat(document.getElementById('tp5').value) || 0;
+            
+            // Get weight values
+            const weight1 = parseFloat(document.getElementById('weight1').value) || 0;
+            const weight2 = parseFloat(document.getElementById('weight2').value) || 0;
+            const weight3 = parseFloat(document.getElementById('weight3').value) || 0;
+            const weight4 = parseFloat(document.getElementById('weight4').value) || 0;
+            const weight5 = parseFloat(document.getElementById('weight5').value) || 0;
+            
+            if (tp1 === 0 && tp2 === 0 && tp3 === 0 && tp4 === 0 && tp5 === 0) {
+                document.getElementById('tpResults').style.display = 'none';
+                return;
+            }
+            
+            // Calculate weighted average
+            const weights = [weight1/100, weight2/100, weight3/100, weight4/100, weight5/100];
+            const tpValues = [tp1, tp2, tp3, tp4, tp5];
+            
+            let weightedTP = 0;
+            let totalWeight = 0;
+            
+            for (let i = 0; i < 5; i++) {
+                if (tpValues[i] > 0 && weights[i] > 0) {
+                    weightedTP += tpValues[i] * weights[i];
+                    totalWeight += weights[i];
+                }
+            }
+            
+            if (totalWeight > 0) {
+                weightedTP = weightedTP / totalWeight;
+            }
+            
+            // Calculate R:R Ratio
+            const rrRatio = totalWeight > 0 ? weightedTP / stopLoss : 0;
+            
+            // Calculate position splits and profits
+            const tp1Split = tp1 > 0 ? positionSize * (weight1/100) : 0;
+            const tp2Split = tp2 > 0 ? positionSize * (weight2/100) : 0;
+            const tp3Split = tp3 > 0 ? positionSize * (weight3/100) : 0;
+            const tp4Split = tp4 > 0 ? positionSize * (weight4/100) : 0;
+            const tp5Split = tp5 > 0 ? positionSize * (weight5/100) : 0;
+            
+            // Calculate profits from each TP level
+            const tp1Profit = tp1Split * (tp1/100);
+            const tp2Profit = tp2Split * (tp2/100);
+            const tp3Profit = tp3Split * (tp3/100);
+            const tp4Profit = tp4Split * (tp4/100);
+            const tp5Profit = tp5Split * (tp5/100);
+            
+            // Update display
+            document.getElementById('averageTP').textContent = `${weightedTP.toFixed(2)}%`;
+            document.getElementById('rrRatio').textContent = `1:${rrRatio.toFixed(2)}`;
+            
+            document.getElementById('tp1Split').textContent = tp1 > 0 ? 
+                `${tp1Split.toFixed(0)} USDT (${tp1.toFixed(2)}%) → กำไร ${tp1Profit.toFixed(0)} USDT` : 'ไม่ใช้';
+            document.getElementById('tp2Split').textContent = tp2 > 0 ? 
+                `${tp2Split.toFixed(0)} USDT (${tp2.toFixed(2)}%) → กำไร ${tp2Profit.toFixed(0)} USDT` : 'ไม่ใช้';
+            document.getElementById('tp3Split').textContent = tp3 > 0 ? 
+                `${tp3Split.toFixed(0)} USDT (${tp3.toFixed(2)}%) → กำไร ${tp3Profit.toFixed(0)} USDT` : 'ไม่ใช้';
+            document.getElementById('tp4Split').textContent = tp4 > 0 ? 
+                `${tp4Split.toFixed(0)} USDT (${tp4.toFixed(2)}%) → กำไร ${tp4Profit.toFixed(0)} USDT` : 'ไม่ใช้';
+            document.getElementById('tp5Split').textContent = tp5 > 0 ? 
+                `${tp5Split.toFixed(0)} USDT (${tp5.toFixed(2)}%) → กำไร ${tp5Profit.toFixed(0)} USDT` : 'ไม่ใช้';
+            
+            document.getElementById('tpResults').style.display = 'block';
+        }
+
+        function resetPositionCalculator() {
+            // Reset position calculator inputs
+            const riskInput = document.getElementById('riskAmount');
+            const stopLossInput = document.getElementById('stopLossPercent');
+            const positionInput = document.getElementById('positionSize');
+            
+            if (riskInput) riskInput.value = '';
+            if (stopLossInput) stopLossInput.value = '';
+            if (positionInput) positionInput.value = '';
+            
+            // Reset Take Profit inputs
+            const tpInputs = ['tp1', 'tp2', 'tp3', 'tp4', 'tp5'];
+            tpInputs.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) input.value = '';
+            });
+            
+            // Reset weight to current active strategy
+            const activeStrategy = document.querySelector('.strategy-btn.active');
+            if (activeStrategy) {
+                const strategyNumber = parseFloat(activeStrategy.dataset.strategy);
+                applyStrategy(strategyNumber);
+            }
+            
+            // Hide result sections
+            const positionResults = document.getElementById('positionResults');
+            const tpResults = document.getElementById('tpResults');
+            if (positionResults) positionResults.style.display = 'none';
+            if (tpResults) tpResults.style.display = 'none';
+        }
+
+        function resetCalculator() {
+            // Reset all checkboxes (trading signals)
+            document.querySelectorAll('input[type="checkbox"][id^="long_"], input[type="checkbox"][id^="short_"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Reset form inputs
+            const elements = [
+                'riskAmount', 'stopLossPercent', 
+                'positionSize', 'tp1', 'tp2', 'tp3', 'tp4', 'tp5',
+                'weight1', 'weight2', 'weight3', 'weight4', 'weight5'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.value = '';
+            });
+            
+            // Hide sections
+            const sections = ['positionResults', 'tpResults'];
+            sections.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.style.display = 'none';
+            });
+
+            // Reset to STRATEGY 1 (default)
+            document.querySelectorAll('.strategy-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-strategy="1"]').classList.add('active');
+            
+            updateScore();
+            setDefaultValues();
+        }
+
+        // Add event listeners to all checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateScore);
+        });
+
+        // Initialize
+        setMode('long');
+        setDefaultValues();
+    </script>
 </body>
 </html>
